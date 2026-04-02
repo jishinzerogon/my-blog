@@ -1,0 +1,20 @@
+name: CI
+
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: コードを取得
+        users: actions/checkout@v4
+
+      - name: Dockerイメージをビルド
+        run: docker build -t my-blog .
+EOF
