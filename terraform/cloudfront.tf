@@ -4,7 +4,7 @@ resource "aws_cloudfront_distribution" "main" {
   aliases             = ["jishinzerogon.dev"]
 
   origin {
-    domain_name = "nginx.my-blog.local"
+    domain_name = aws_lb.main.dns_name
     origin_id   = "ecs-nginx"
 
     custom_origin_config {
