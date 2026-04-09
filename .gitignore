@@ -1,3 +1,6 @@
+# Vim
+*.un~
+
 # Terraform
 *.tfstate
 *.tfstate.backup
