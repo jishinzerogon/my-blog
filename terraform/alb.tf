@@ -1,18 +1,18 @@
 resource "aws_lb" "main" {
-  name               = "my-blog-alb"
+  name               = "${var.project}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.ecs.id]
+  security_groups    = [aws_security_group.alb.id]
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_c.id]
 
   tags = {
-    Name = "my-blog-alb"
+    Name = "${var.project}-alb"
   }
 }
 
 
 resource "aws_lb_target_group" "main" {
-  name        = "my-blog-tg"
+  name        = "${var.project}-tg"
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
@@ -26,7 +26,7 @@ resource "aws_lb_target_group" "main" {
   }
 
   tags = {
-    Name = "my-blog-tg"
+    Name = "${var.project}-tg"
   }
 }
 
@@ -40,4 +40,3 @@ resource "aws_lb_listener" "main" {
     target_group_arn = aws_lb_target_group.main.arn
   }
 }
-
