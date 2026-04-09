@@ -1,5 +1,5 @@
 resource "aws_ecr_repository" "my_blog" {
-  name                 = "my-blog"
+  name                 = var.project
   image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
@@ -7,6 +7,6 @@ resource "aws_ecr_repository" "my_blog" {
   }
 
   tags = {
-    Name = "my-blog"
+    Name = var.project
   }
 }

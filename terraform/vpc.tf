@@ -1,29 +1,29 @@
 resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
 
   tags = {
-    Name = "my-blog-vpc"
+    Name = "${var.project}-vpc"
   }
 }
 
 resource "aws_subnet" "public_a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "ap-northeast-1a"
+  cidr_block        = var.subnet_cidrs["public_a"]
+  availability_zone = "${var.region}a"
 
   tags = {
-    Name = "my-blog-subnet-public-a"
+    Name = "${var.project}-subnet-public-a"
   }
 }
 
 
 resource "aws_subnet" "public_c" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "ap-northeast-1c"
+  cidr_block        = var.subnet_cidrs["public_c"]
+  availability_zone = "${var.region}c"
 
   tags = {
-    Name = "my-blog-subnet-public-c"
+    Name = "${var.project}-subnet-public-c"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "my-blog-igw"
+    Name = "${var.project}-igw"
   }
 }
 
@@ -44,7 +44,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "my-blog-rtb-public"
+    Name = "${var.project}-rtb-public"
   }
 }
 
@@ -57,5 +57,3 @@ resource "aws_route_table_association" "public_c" {
   subnet_id      = aws_subnet.public_c.id
   route_table_id = aws_route_table.public.id
 }
-
-

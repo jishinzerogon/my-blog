@@ -1,7 +1,11 @@
+data "aws_cloudfront_cache_policy" "caching_optimized" {
+  name = "Managed-CachingOptimized"
+}
+
 resource "aws_cloudfront_distribution" "main" {
   enabled             = true
   default_root_object = "index.html"
-  aliases             = ["jishinzerogon.dev"]
+  aliases             = [var.domain_name]
 
   origin {
     domain_name = aws_lb.main.dns_name
@@ -21,12 +25,7 @@ resource "aws_cloudfront_distribution" "main" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
 
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_optimized.id
   }
 
   restrictions {
@@ -42,6 +41,6 @@ resource "aws_cloudfront_distribution" "main" {
   }
 
   tags = {
-    Name = "my-blog-cloudfront"
+    Name = "${var.project}-cloudfront"
   }
 }

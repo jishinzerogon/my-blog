@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution" {
-  name = "my-blog-ecs-task-execution-role"
+  name = "${var.project}-ecs-task-execution-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -15,7 +15,7 @@ resource "aws_iam_role" "ecs_task_execution" {
   })
 
   tags = {
-    Name = "my-blog-ecs-task-execution-role"
+    Name = "${var.project}-ecs-task-execution-role"
   }
 }
 
