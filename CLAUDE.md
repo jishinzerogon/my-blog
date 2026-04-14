@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-`jishinzerogon.dev` で公開されている個人ブログのインフラ一式。静的な nginx コンテナを AWS 上で動かし、Terraform で構成管理している。転職活動のポートフォリオとして採用担当者に Terraform コードを見せることを意図しているため、コードの読みやすさ・ベストプラクティスへの準拠を重視する。
+`jishinzerogon.dev` で公開されている個人ブログのインフラ一式。静的な nginx コンテナを AWS 上で動かし、Terraform で構成管理している。コードの読みやすさ・ベストプラクティスへの準拠を重視する。
 
 ## アーキテクチャ
 
