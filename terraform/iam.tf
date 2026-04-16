@@ -95,15 +95,18 @@ resource "aws_iam_role_policy" "github_actions" {
         Effect = "Allow"
         Action = [
           "ec2:Describe*",
+          "ec2:GetManagedPrefixListEntries",
           "ecs:Describe*",
           "ecs:List*",
           "elasticloadbalancing:Describe*",
           "ecr:Describe*",
           "ecr:GetRepositoryPolicy",
           "ecr:GetLifecyclePolicy",
+          "ecr:ListTagsForResource",
           "cloudfront:GetDistribution",
           "cloudfront:ListTagsForResource",
           "cloudfront:GetCachePolicy",
+          "cloudfront:ListCachePolicies",
           "acm:DescribeCertificate",
           "acm:ListTagsForCertificate",
           "logs:DescribeLogGroups",
