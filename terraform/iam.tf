@@ -79,6 +79,44 @@ resource "aws_iam_role_policy" "github_actions" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "TfStateRead"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.project}-tfstate-*",
+          "arn:aws:s3:::${var.project}-tfstate-*/*",
+        ]
+      },
+      {
+        Sid    = "TfPlanRead"
+        Effect = "Allow"
+        Action = [
+          "ec2:Describe*",
+          "ecs:Describe*",
+          "ecs:List*",
+          "elasticloadbalancing:Describe*",
+          "ecr:Describe*",
+          "ecr:GetRepositoryPolicy",
+          "ecr:GetLifecyclePolicy",
+          "cloudfront:GetDistribution",
+          "cloudfront:ListTagsForResource",
+          "cloudfront:GetCachePolicy",
+          "acm:DescribeCertificate",
+          "acm:ListTagsForCertificate",
+          "logs:DescribeLogGroups",
+          "logs:ListTagsForResource",
+          "iam:GetRole",
+          "iam:GetRolePolicy",
+          "iam:ListRolePolicies",
+          "iam:ListAttachedRolePolicies",
+          "iam:GetOpenIDConnectProvider",
+        ]
+        Resource = "*"
+      },
+      {
         Sid      = "EcrAuth"
         Effect   = "Allow"
         Action   = "ecr:GetAuthorizationToken"
