@@ -12,3 +12,8 @@ output "ecr_repository_url" {
   description = "ECR repository URL for Docker push"
   value       = aws_ecr_repository.my_blog.repository_url
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name"
+  value       = aws_ecs_cluster.main.name
+}
