@@ -54,7 +54,12 @@ resource "aws_iam_role" "github_actions" {
         Condition = {
           StringEquals = {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:ref:refs/heads/main"
+          }
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = [
+              "repo:${var.github_repository}:ref:refs/heads/main",
+              "repo:${var.github_repository}:pull_request",
+            ]
           }
         }
       }
@@ -99,7 +104,7 @@ resource "aws_iam_role_policy" "github_actions" {
           "ecs:UpdateService",
           "ecs:DescribeServices",
         ]
-        Resource = aws_ecs_service.main.id
+        Resource = "arn:aws:ecs:${var.region}:*:service/${var.project}-cluster/${var.project}-service"
       },
     ]
   })
