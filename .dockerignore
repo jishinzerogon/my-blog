@@ -5,3 +5,6 @@ terraform/
 *.md
 Dockerfile
 .dockerignore
+node_modules/
+dist/
+html/
