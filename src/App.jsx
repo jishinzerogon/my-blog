@@ -11,7 +11,7 @@ const STATS = {
   exp: { current: 6, max: 10, label: "EXP", tooltip: "エンジニア歴 — 6年目" },
 };
 
-const MAX_YEARS = 6; // max bar scale
+const MAX_YEARS = 6;
 
 const SKILLS = [
   { name: "Linux", years: 6, element: "🐧", color: "#FCC624", tags: ["Amazon Linux", "CentOS"] },
@@ -36,11 +36,7 @@ const INVENTORY = [
   { name: "ITパスポート", rarity: "rare", icon: "📜", year: "2020" },
 ];
 
-const POSTS = [
-  { title: "ECS Fargateでゲーム用ブログサーバーを構築した話", date: "2025-04-10", tags: ["AWS", "ECS"], exp: 120 },
-  { title: "大規模ゲームイベントを支えるインフラ設計", date: "2025-03-22", tags: ["設計", "負荷対策"], exp: 200 },
-  { title: "GitHub ActionsでゲームサーバーのCI/CDを自動化", date: "2025-03-05", tags: ["CI/CD", "自動化"], exp: 150 },
-];
+const POSTS = [];
 
 const RARITY_COLORS = {
   legendary: { bg: "#FF9900", text: "#1a0a00", glow: "#FF990066", label: "★★★★★" },
@@ -48,80 +44,32 @@ const RARITY_COLORS = {
   rare: { bg: "#3b82f6", text: "#001a33", glow: "#3b82f666", label: "★★★☆☆" },
 };
 
-/* ─── COST DATA (dummy — will be replaced by API) ─── */
-const COST_DATA = {
-  monthlyTotal: 12.47,
-  dailyAverage: 0.41,
-  todayCost: 0.38,
-  lastUpdated: "2025-04-16 09:00 JST",
-  currency: "USD",
-  services: [
-    { name: "ECS Fargate", cost: 5.12, icon: "⚙", color: "#FF9900", rpgName: "召喚獣維持費" },
-    { name: "ALB", cost: 2.88, icon: "🛡", color: "#f59e0b", rpgName: "結界維持費" },
-    { name: "Route 53", cost: 1.50, icon: "🧭", color: "#8b5cf6", rpgName: "転送魔法陣使用料" },
-    { name: "ECR", cost: 1.20, icon: "📦", color: "#3b82f6", rpgName: "アイテム保管庫" },
-    { name: "CloudWatch", cost: 0.92, icon: "👁", color: "#22c55e", rpgName: "千里眼の水晶" },
-    { name: "S3", cost: 0.53, icon: "🗄", color: "#06b6d4", rpgName: "古文書保管庫" },
-    { name: "Data Transfer", cost: 0.32, icon: "🌐", color: "#ec4899", rpgName: "テレポート通信費" },
-  ],
-  dailyTrend: [
-    0.35, 0.38, 0.42, 0.39, 0.41, 0.44, 0.40,
-    0.37, 0.43, 0.45, 0.38, 0.36, 0.39, 0.42,
-    0.41, 0.38, 0.44, 0.46, 0.43, 0.40, 0.37,
-    0.39, 0.42, 0.41, 0.38, 0.40, 0.43, 0.39,
-    0.41, 0.38,
-  ],
-  monthlyTrend: [
-    { month: "Nov", cost: 10.20 },
-    { month: "Dec", cost: 11.80 },
-    { month: "Jan", cost: 11.50 },
-    { month: "Feb", cost: 12.10 },
-    { month: "Mar", cost: 12.30 },
-    { month: "Apr", cost: 12.47 },
-  ],
-};
+const TIMELINE = [];
 
-/* ─── COMPONENTS ─── */
+const CONTACTS = [
+  { name: "GitHub", icon: "◈", url: "https://github.com/jishinzerogon", color: "#c9d1d9", desc: "ソースコード & コントリビューション" },
+];
 
-function PixelBorder({ children, style, glowing, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: "#0c0e1a",
-        border: "2px solid #2a2e4a",
-        borderRadius: 2,
-        position: "relative",
-        cursor: onClick ? "pointer" : "default",
-        boxShadow: glowing ? "0 0 16px #4a6cf733, inset 0 0 20px #0a0c1a" : "inset 0 0 20px #0a0c1a",
-        transition: "box-shadow 0.3s",
-        ...style,
-      }}
-    >
-      {["top:0;left:0", "top:0;right:0", "bottom:0;left:0", "bottom:0;right:0"].map((pos, i) => {
-        const s = {};
-        pos.split(";").forEach(p => { const [k, v] = p.split(":"); s[k] = v; });
-        return (
-          <div key={i} style={{
-            position: "absolute", width: 6, height: 6,
-            borderTop: s.top !== undefined ? "2px solid #4a6cf7" : "none",
-            borderBottom: s.bottom !== undefined ? "2px solid #4a6cf7" : "none",
-            borderLeft: s.left !== undefined ? "2px solid #4a6cf7" : "none",
-            borderRight: s.right !== undefined ? "2px solid #4a6cf7" : "none",
-            ...s, zIndex: 2,
-          }} />
-        );
-      })}
-      {children}
-    </div>
-  );
+/* ─── HOOKS ─── */
+function useIsMobile(breakpoint = 640) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < breakpoint);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [breakpoint]);
+  return isMobile;
 }
 
+/* ─── COMPONENTS ─── */
 function Tooltip({ text, children, inline }) {
   const [show, setShow] = useState(false);
+  const isMobile = useIsMobile();
   return (
     <div style={{ position: "relative", display: inline ? "inline-flex" : "flex", width: inline ? undefined : "100%" }}
-      onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+      onMouseEnter={() => !isMobile && setShow(true)} onMouseLeave={() => setShow(false)}
+      onClick={() => isMobile && setShow(s => !s)}
     >
       {children}
       {show && text && (
@@ -130,7 +78,7 @@ function Tooltip({ text, children, inline }) {
           background: "#1a1d30", border: "1px solid #4a6cf744", borderRadius: 3,
           padding: "6px 10px", fontSize: 10, color: "#c5cbe3", whiteSpace: "nowrap",
           zIndex: 100, boxShadow: "0 4px 12px #00000066", animation: "fadeIn 0.15s ease",
-          pointerEvents: "none",
+          pointerEvents: "none", maxWidth: "80vw",
         }}>
           <div style={{
             position: "absolute", bottom: -4, left: "50%", transform: "translateX(-50%) rotate(45deg)",
@@ -140,6 +88,31 @@ function Tooltip({ text, children, inline }) {
           {text}
         </div>
       )}
+    </div>
+  );
+}
+
+function PixelBorder({ children, style, glowing, onClick }) {
+  return (
+    <div onClick={onClick} style={{
+      background: "#0c0e1a", border: "2px solid #2a2e4a", borderRadius: 2, position: "relative",
+      cursor: onClick ? "pointer" : "default",
+      boxShadow: glowing ? "0 0 16px #4a6cf733, inset 0 0 20px #0a0c1a" : "inset 0 0 20px #0a0c1a",
+      transition: "box-shadow 0.3s", ...style,
+    }}>
+      {["top:0;left:0","top:0;right:0","bottom:0;left:0","bottom:0;right:0"].map((pos, i) => {
+        const s = {};
+        pos.split(";").forEach(p => { const [k,v] = p.split(":"); s[k] = v; });
+        return <div key={i} style={{
+          position: "absolute", width: 6, height: 6,
+          borderTop: s.top !== undefined ? "2px solid #4a6cf7" : "none",
+          borderBottom: s.bottom !== undefined ? "2px solid #4a6cf7" : "none",
+          borderLeft: s.left !== undefined ? "2px solid #4a6cf7" : "none",
+          borderRight: s.right !== undefined ? "2px solid #4a6cf7" : "none",
+          ...s, zIndex: 2,
+        }} />;
+      })}
+      {children}
     </div>
   );
 }
@@ -156,7 +129,7 @@ function GaugeBar({ current, max, color, height = 14, label, showText = true, to
       <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", cursor: tooltip ? "help" : "default" }}>
         {label && <span style={{ color: "#8890b5", fontSize: 11, fontWeight: 700, width: 28, textAlign: "right" }}>{label}</span>}
         <div style={{ flex: 1, height, background: "#1a1d30", borderRadius: 1, border: "1px solid #2a2e4a", overflow: "hidden", position: "relative" }}>
-          <div style={{ position: "absolute", inset: 0, zIndex: 2, backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent ${height - 2}px, #0c0e1a44 ${height - 2}px, #0c0e1a44 ${height}px)` }} />
+          <div style={{ position: "absolute", inset: 0, zIndex: 2, backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent ${height-2}px, #0c0e1a44 ${height-2}px, #0c0e1a44 ${height}px)` }} />
           <div style={{ height: "100%", width: `${animWidth}%`, background: `linear-gradient(180deg, ${color}, ${color}aa)`, boxShadow: `0 0 8px ${color}44`, transition: "width 1.5s cubic-bezier(0.22, 1, 0.36, 1)", position: "relative", zIndex: 1 }} />
         </div>
         {showText && <span style={{ color: "#8890b5", fontSize: 10, fontFamily: "inherit", width: 64, textAlign: "right" }}>{current}/{max}</span>}
@@ -167,178 +140,44 @@ function GaugeBar({ current, max, color, height = 14, label, showText = true, to
 
 function FloatingParticles() {
   const particles = Array.from({ length: 15 }, (_, i) => ({
-    id: i, left: Math.random() * 100, delay: Math.random() * 8,
-    duration: 6 + Math.random() * 6, size: 2 + Math.random() * 3, opacity: 0.15 + Math.random() * 0.25,
+    id: i, left: Math.random()*100, delay: Math.random()*8,
+    duration: 6+Math.random()*6, size: 2+Math.random()*3, opacity: 0.15+Math.random()*0.25,
   }));
   return (
     <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-      {particles.map(p => (
-        <div key={p.id} style={{
-          position: "absolute", left: `${p.left}%`, bottom: -10, width: p.size, height: p.size,
-          borderRadius: "50%", background: "#4a6cf7", opacity: p.opacity,
-          animation: `particleFloat ${p.duration}s ${p.delay}s linear infinite`,
-        }} />
-      ))}
+      {particles.map(p => <div key={p.id} style={{
+        position: "absolute", left: `${p.left}%`, bottom: -10, width: p.size, height: p.size,
+        borderRadius: "50%", background: "#4a6cf7", opacity: p.opacity,
+        animation: `particleFloat ${p.duration}s ${p.delay}s linear infinite`,
+      }} />)}
     </div>
   );
 }
 
-/* ─── COST CHART COMPONENTS ─── */
-
-function MiniBarChart({ services }) {
-  const maxCost = Math.max(...services.map(s => s.cost));
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimate(true), 300); return () => clearTimeout(t); }, []);
-
+/* ─── MOBILE MENU BUTTON ─── */
+function HamburgerButton({ open, onClick }) {
+  const bar = { width: 18, height: 2, background: "#4a6cf7", borderRadius: 1, transition: "all 0.3s ease" };
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {services.map((svc, i) => (
-        <div key={svc.name} style={{
-          animation: "slideUp 0.4s ease both", animationDelay: `${i * 60}ms`,
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 3 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 13 }}>{svc.icon}</span>
-              <span style={{ color: "#c5cbe3", fontSize: 11 }}>{svc.name}</span>
-              <span style={{ color: "#4a5578", fontSize: 9 }}>({svc.rpgName})</span>
-            </div>
-            <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: "#eab308" }}>
-              ${svc.cost.toFixed(2)}
-            </span>
-          </div>
-          <div style={{ height: 10, background: "#1a1d30", borderRadius: 1, border: "1px solid #2a2e4a22", overflow: "hidden", position: "relative" }}>
-            <div style={{
-              height: "100%",
-              width: animate ? `${(svc.cost / maxCost) * 100}%` : "0%",
-              background: `linear-gradient(90deg, ${svc.color}88, ${svc.color})`,
-              borderRadius: 1,
-              transition: "width 1s cubic-bezier(0.22, 1, 0.36, 1)",
-              transitionDelay: `${i * 80}ms`,
-              boxShadow: `0 0 6px ${svc.color}33`,
-            }} />
-          </div>
-        </div>
-      ))}
-    </div>
+    <button onClick={onClick} style={{
+      background: "#0c0e1a", border: "2px solid #2a2e4a", borderRadius: 2,
+      width: 40, height: 40, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", gap: 3, cursor: "pointer",
+      flexShrink: 0,
+    }}>
+      <div style={{ ...bar, transform: open ? "rotate(45deg) translate(3.5px, 3.5px)" : "none" }} />
+      <div style={{ ...bar, opacity: open ? 0 : 1 }} />
+      <div style={{ ...bar, transform: open ? "rotate(-45deg) translate(3.5px, -3.5px)" : "none" }} />
+    </button>
   );
 }
 
-function SparkLine({ data, width = 480, height = 100, color = "#eab308" }) {
-  const [show, setShow] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setShow(true), 500); return () => clearTimeout(t); }, []);
-
-  const max = Math.max(...data) * 1.15;
-  const min = Math.min(...data) * 0.85;
-  const range = max - min;
-  const stepX = width / (data.length - 1);
-
-  const points = data.map((v, i) => ({
-    x: i * stepX,
-    y: height - ((v - min) / range) * height,
-  }));
-
-  const pathD = points.map((p, i) => {
-    if (i === 0) return `M ${p.x} ${p.y}`;
-    const prev = points[i - 1];
-    const cpx1 = prev.x + stepX * 0.4;
-    const cpx2 = p.x - stepX * 0.4;
-    return `C ${cpx1} ${prev.y}, ${cpx2} ${p.y}, ${p.x} ${p.y}`;
-  }).join(" ");
-
-  const areaD = pathD + ` L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
-
-  // Y-axis labels
-  const yLabels = [min, min + range * 0.5, max].map(v => ({
-    value: `$${v.toFixed(2)}`,
-    y: height - ((v - min) / range) * height,
-  }));
-
+/* ─── COMING SOON PLACEHOLDER ─── */
+function ComingSoon({ icon, message }) {
   return (
-    <div style={{ position: "relative" }}>
-      <svg width="100%" viewBox={`-40 -10 ${width + 50} ${height + 30}`} style={{
-        opacity: show ? 1 : 0, transition: "opacity 0.8s ease",
-      }}>
-        <defs>
-          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.15" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.01" />
-          </linearGradient>
-          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={color} stopOpacity="0.6" />
-            <stop offset="50%" stopColor={color} stopOpacity="1" />
-            <stop offset="100%" stopColor={color} stopOpacity="0.8" />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        {yLabels.map((yl, i) => (
-          <g key={i}>
-            <line x1={0} y1={yl.y} x2={width} y2={yl.y} stroke="#1a1d30" strokeWidth={1} strokeDasharray="4 4" />
-            <text x={-8} y={yl.y + 3} textAnchor="end" fill="#4a5578" fontSize={8} fontFamily="'M PLUS 1 Code', monospace">{yl.value}</text>
-          </g>
-        ))}
-
-        {/* X-axis labels */}
-        {[0, 9, 19, 29].map(i => (
-          <text key={i} x={i * stepX} y={height + 16} textAnchor="middle" fill="#4a5578" fontSize={8} fontFamily="'M PLUS 1 Code', monospace">
-            {i + 1}日
-          </text>
-        ))}
-
-        {/* Area fill */}
-        <path d={areaD} fill="url(#areaGrad)" />
-
-        {/* Line */}
-        <path d={pathD} fill="none" stroke="url(#lineGrad)" strokeWidth={2} strokeLinecap="round" />
-
-        {/* End dot */}
-        <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={4} fill={color} opacity={0.9}>
-          <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite" />
-        </circle>
-
-        {/* End value label */}
-        <text x={points[points.length - 1].x} y={points[points.length - 1].y - 10} textAnchor="middle" fill={color} fontSize={9} fontWeight="bold" fontFamily="'Press Start 2P', monospace">
-          ${data[data.length - 1].toFixed(2)}
-        </text>
-      </svg>
-    </div>
-  );
-}
-
-function MonthlyTrendBars({ data }) {
-  const max = Math.max(...data.map(d => d.cost)) * 1.15;
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimate(true), 400); return () => clearTimeout(t); }, []);
-
-  return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 80, padding: "0 4px" }}>
-      {data.map((d, i) => {
-        const isLatest = i === data.length - 1;
-        return (
-          <div key={d.month} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-            <span style={{
-              fontFamily: "'Press Start 2P', monospace",
-              fontSize: 7, color: isLatest ? "#eab308" : "#6b7199",
-            }}>
-              ${d.cost.toFixed(1)}
-            </span>
-            <div style={{
-              width: "100%", maxWidth: 36,
-              height: animate ? `${(d.cost / max) * 60}px` : "0px",
-              background: isLatest
-                ? "linear-gradient(180deg, #eab308, #b45309)"
-                : "linear-gradient(180deg, #2a2e4a, #1a1d30)",
-              border: `1px solid ${isLatest ? "#eab30844" : "#2a2e4a"}`,
-              borderRadius: "2px 2px 0 0",
-              transition: "height 0.8s cubic-bezier(0.22, 1, 0.36, 1)",
-              transitionDelay: `${i * 100}ms`,
-              boxShadow: isLatest ? "0 0 10px #eab30833" : "none",
-            }} />
-            <span style={{ fontSize: 9, color: isLatest ? "#eab308" : "#6b7199" }}>{d.month}</span>
-          </div>
-        );
-      })}
+    <div style={{ textAlign: "center", padding: "40px 0" }}>
+      <div style={{ fontSize: 32, marginBottom: 12 }}>{icon}</div>
+      <div style={{ color: "#4a6cf7", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>COMING SOON</div>
+      <div style={{ color: "#6b7199", fontSize: 12, marginTop: 8 }}>{message}</div>
     </div>
   );
 }
@@ -349,6 +188,8 @@ export default function GamePortfolio() {
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const t1 = setTimeout(() => setMenuVisible(true), 300);
@@ -362,6 +203,11 @@ export default function GamePortfolio() {
     return () => clearTimeout(t);
   }, [activeTab]);
 
+  const handleTabClick = (id) => {
+    setActiveTab(id);
+    setMobileMenuOpen(false);
+  };
+
   const tabs = [
     { id: "status", label: "自己紹介", sub: "ステータス", icon: "♦" },
     { id: "skills", label: "技術スキル", sub: "スキル", icon: "✦" },
@@ -369,7 +215,34 @@ export default function GamePortfolio() {
     { id: "inventory", label: "資格", sub: "装備", icon: "◈" },
     { id: "log", label: "ブログ", sub: "冒険記録", icon: "📖" },
     { id: "treasury", label: "コスト", sub: "ギルド金庫", icon: "💰" },
+    { id: "contact", label: "お問い合わせ", sub: "ギルド受付", icon: "✉" },
   ];
+
+  /* ─── TAB BUTTON (shared between sidebar & mobile) ─── */
+  const TabButton = ({ tab, horizontal }) => (
+    <button onClick={() => handleTabClick(tab.id)} style={{
+      display: "flex", alignItems: "center", gap: horizontal ? 4 : 8,
+      width: horizontal ? "auto" : "100%",
+      background: activeTab === tab.id ? "#1a1d30" : "transparent",
+      color: activeTab === tab.id ? (tab.id === "treasury" ? "#eab308" : "#4a6cf7") : "#6b7199",
+      border: "none",
+      borderLeft: horizontal ? "none" : (activeTab === tab.id ? `2px solid ${tab.id === "treasury" ? "#eab308" : "#4a6cf7"}` : "2px solid transparent"),
+      borderBottom: horizontal ? (activeTab === tab.id ? `2px solid ${tab.id === "treasury" ? "#eab308" : "#4a6cf7"}` : "2px solid transparent") : "none",
+      padding: horizontal ? "8px 10px" : "7px 10px",
+      fontSize: 12, fontFamily: "inherit", cursor: "pointer",
+      transition: "all 0.15s", textAlign: "left", whiteSpace: "nowrap",
+    }}>
+      <span style={{ fontSize: 12, width: horizontal ? "auto" : 16, textAlign: "center", flexShrink: 0 }}>{tab.icon}</span>
+      {horizontal ? (
+        <span style={{ fontSize: 11 }}>{tab.label}</span>
+      ) : (
+        <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
+          <span style={{ fontSize: 11 }}>{tab.label}</span>
+          <span style={{ fontSize: 8, color: "#4a5578" }}>{tab.sub}</span>
+        </span>
+      )}
+    </button>
+  );
 
   return (
     <div style={{
@@ -382,98 +255,98 @@ export default function GamePortfolio() {
         @keyframes particleFloat { 0%{transform:translateY(0) scale(1);opacity:var(--o)} 100%{transform:translateY(-100vh) scale(0.3);opacity:0} }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes slideDown { from{opacity:0;max-height:0} to{opacity:1;max-height:400px} }
         @keyframes glow { 0%,100%{text-shadow:0 0 4px #4a6cf744} 50%{text-shadow:0 0 12px #4a6cf788} }
         @keyframes goldGlow { 0%,100%{text-shadow:0 0 4px #eab30844} 50%{text-shadow:0 0 16px #eab30888} }
         @keyframes borderPulse { 0%,100%{border-color:#2a2e4a} 50%{border-color:#4a6cf755} }
         @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        @keyframes coinSpin { 0%{transform:rotateY(0deg)} 100%{transform:rotateY(360deg)} }
         @keyframes countUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         ::selection { background: #4a6cf744; color: #fff; }
       `}</style>
 
       <FloatingParticles />
-
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 0, opacity: 0.025,
+      <div style={{ position: "fixed", inset: 0, zIndex: 0, opacity: 0.025,
         backgroundImage: `linear-gradient(45deg, #4a6cf7 1px, transparent 1px), linear-gradient(-45deg, #4a6cf7 1px, transparent 1px)`,
         backgroundSize: "40px 40px",
       }} />
 
-      {/* Header */}
+      {/* ═══ HEADER ═══ */}
       <div style={{
         position: "relative", zIndex: 10,
         background: "linear-gradient(180deg, #0f1229 0%, #080a14 100%)",
-        borderBottom: "2px solid #2a2e4a", padding: "20px 24px 16px",
+        borderBottom: "2px solid #2a2e4a", padding: isMobile ? "14px 16px 12px" : "20px 24px 16px",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 16, flexWrap: "wrap" }}>
+            {isMobile && <HamburgerButton open={mobileMenuOpen} onClick={() => setMobileMenuOpen(o => !o)} />}
+
             <div style={{
-              width: 56, height: 56, background: "linear-gradient(135deg, #1a1d30, #2a2e4a)",
+              width: isMobile ? 40 : 56, height: isMobile ? 40 : 56,
+              background: "linear-gradient(135deg, #1a1d30, #2a2e4a)",
               border: "2px solid #4a6cf7", borderRadius: 2,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: isMobile ? 18 : 24,
               boxShadow: "0 0 12px #4a6cf733", animation: "borderPulse 3s ease infinite",
+              flexShrink: 0,
             }}>⚔</div>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <h1 style={{ fontFamily: "'Press Start 2P', 'DotGothic16', monospace", fontSize: 16, color: "#e2e8ff", letterSpacing: 2, animation: "glow 3s ease infinite" }}>{STATS.name}</h1>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{
+                fontFamily: "'Press Start 2P', 'DotGothic16', monospace",
+                fontSize: isMobile ? 11 : 16, color: "#e2e8ff", letterSpacing: 2,
+                animation: "glow 3s ease infinite",
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+              }}>{STATS.name}</h1>
               <Tooltip text={STATS.titleTooltip} inline>
-                <div style={{ color: "#4a6cf7", fontSize: 12, marginTop: 4, fontWeight: 700, cursor: "help" }}>{STATS.title}</div>
+                <div style={{ color: "#4a6cf7", fontSize: isMobile ? 10 : 12, marginTop: 3, fontWeight: 700, cursor: "help" }}>{STATS.title}</div>
               </Tooltip>
-              <div style={{ color: "#6b7199", fontSize: 11, marginTop: 2 }}>{STATS.subtitle}</div>
+              {!isMobile && <div style={{ color: "#6b7199", fontSize: 11, marginTop: 2 }}>{STATS.subtitle}</div>}
             </div>
-            <div style={{ width: 240 }}>
-              <div style={{ marginBottom: 4 }}><GaugeBar current={STATS.hp.current} max={STATS.hp.max} color="#22c55e" label={STATS.hp.label} height={10} tooltip={STATS.hp.tooltip} /></div>
-              <div style={{ marginBottom: 4 }}><GaugeBar current={STATS.mp.current} max={STATS.mp.max} color="#3b82f6" label={STATS.mp.label} height={10} tooltip={STATS.mp.tooltip} /></div>
-              <div><GaugeBar current={STATS.exp.current} max={STATS.exp.max} color="#eab308" label={STATS.exp.label} height={8} tooltip={STATS.exp.tooltip} /></div>
+
+            <div style={{ width: isMobile ? "100%" : 240 }}>
+              <div style={{ marginBottom: 4 }}><GaugeBar current={STATS.hp.current} max={STATS.hp.max} color="#22c55e" label={STATS.hp.label} height={isMobile ? 8 : 10} tooltip={STATS.hp.tooltip} /></div>
+              <div style={{ marginBottom: 4 }}><GaugeBar current={STATS.mp.current} max={STATS.mp.max} color="#3b82f6" label={STATS.mp.label} height={isMobile ? 8 : 10} tooltip={STATS.mp.tooltip} /></div>
+              <div><GaugeBar current={STATS.exp.current} max={STATS.exp.max} color="#eab308" label={STATS.exp.label} height={isMobile ? 6 : 8} tooltip={STATS.exp.tooltip} /></div>
             </div>
           </div>
+
+          {isMobile && mobileMenuOpen && (
+            <div style={{
+              marginTop: 12, borderTop: "1px solid #2a2e4a", paddingTop: 8,
+              display: "flex", flexWrap: "wrap", gap: 2,
+              animation: "fadeIn 0.2s ease",
+            }}>
+              {tabs.map(tab => <TabButton key={tab.id} tab={tab} horizontal />)}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Main layout */}
+      {/* ═══ MAIN LAYOUT ═══ */}
       <div style={{
-        maxWidth: 900, margin: "0 auto", padding: "20px 24px 80px",
-        position: "relative", zIndex: 10, display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap",
+        maxWidth: 900, margin: "0 auto", padding: isMobile ? "12px 12px 60px" : "20px 24px 80px",
+        position: "relative", zIndex: 10,
+        display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap",
       }}>
-        {/* Left menu */}
-        <div style={{
-          width: 160, opacity: menuVisible ? 1 : 0,
-          transform: menuVisible ? "translateX(0)" : "translateX(-20px)",
-          transition: "all 0.5s ease", flexShrink: 0,
-        }}>
-          <PixelBorder style={{ padding: 6 }}>
-            <div style={{ padding: "4px 0" }}>
-              <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, padding: "4px 10px", letterSpacing: 2, borderBottom: "1px solid #1a1d30", marginBottom: 2 }}>MENU</div>
-              {tabs.map(tab => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)} style={{
-                  display: "flex", alignItems: "center", gap: 8, width: "100%",
-                  background: activeTab === tab.id ? "#1a1d30" : "transparent",
-                  color: activeTab === tab.id ? (tab.id === "treasury" ? "#eab308" : "#4a6cf7") : "#6b7199",
-                  border: "none",
-                  borderLeft: activeTab === tab.id ? `2px solid ${tab.id === "treasury" ? "#eab308" : "#4a6cf7"}` : "2px solid transparent",
-                  padding: "7px 10px", fontSize: 12, fontFamily: "inherit", cursor: "pointer", transition: "all 0.15s", textAlign: "left",
-                }}>
-                  <span style={{ fontSize: 12, width: 16, textAlign: "center", flexShrink: 0 }}>{tab.icon}</span>
-                  <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-                    <span style={{ fontSize: 11 }}>{tab.label}</span>
-                    <span style={{ fontSize: 8, color: "#4a5578", fontStyle: "normal" }}>{tab.sub}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </PixelBorder>
 
-          <PixelBorder style={{ padding: 10, marginTop: 12 }}>
-            <div style={{ color: "#4a6cf7", fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>INFRA MAP</div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, fontSize: 9, color: "#6b7199" }}>
-              {["GitHub", "↓", "Actions", "↓", "ECR → Fargate", "↓", "ALB → Route53"].map((item, i) => (
-                <span key={i} style={{ color: item === "↓" ? "#2a2e4a" : (item.includes("Fargate") ? "#FF9900" : "#8890b5"), fontWeight: item === "↓" ? 400 : 500, textAlign: "center" }}>{item}</span>
-              ))}
-            </div>
-          </PixelBorder>
-        </div>
+        {/* Desktop sidebar */}
+        {!isMobile && (
+          <div style={{
+            width: 160, opacity: menuVisible ? 1 : 0,
+            transform: menuVisible ? "translateX(0)" : "translateX(-20px)",
+            transition: "all 0.5s ease", flexShrink: 0,
+          }}>
+            <PixelBorder style={{ padding: 6 }}>
+              <div style={{ padding: "4px 0" }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, padding: "4px 10px", letterSpacing: 2, borderBottom: "1px solid #1a1d30", marginBottom: 2 }}>MENU</div>
+                {tabs.map(tab => <TabButton key={tab.id} tab={tab} />)}
+              </div>
+            </PixelBorder>
+          </div>
+        )}
 
-        {/* Right content */}
+        {/* ═══ CONTENT ═══ */}
         <div style={{
           flex: 1, minWidth: 0, opacity: contentVisible ? 1 : 0,
           transform: contentVisible ? "translateY(0)" : "translateY(8px)", transition: "all 0.3s ease",
@@ -482,67 +355,122 @@ export default function GamePortfolio() {
           {/* STATUS */}
           {activeTab === "status" && (
             <div>
-              <PixelBorder style={{ padding: "20px 24px", marginBottom: 16 }}>
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
                 <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>♦ PROFILE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ステータス</span></div>
-                <p style={{ color: "#c5cbe3", fontSize: 13, lineHeight: 2 }}>
-                  ゲーム業界でインフラエンジニアとして活動中。<br />
-                  オンラインゲームのサーバー基盤設計からリリース後の運用まで、<br />
-                  「プレイヤーが快適に遊べるインフラ」を支えることが使命。
+                <p style={{ color: "#c5cbe3", fontSize: 13, lineHeight: 2.2 }}>
+                  ゲーム業界でインフラエンジニアとして活動中。
+                  オンラインゲームのサーバー基盤設計からリリース後の運用まで、
+                  「プレイヤーが快適に遊べるインフラ」を支えることが使命です。
                 </p>
-                <div style={{ marginTop: 16, padding: "12px 16px", background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2, fontSize: 12, color: "#6b7199", lineHeight: 2 }}>
+                <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 2, marginTop: 12 }}>
+                  大規模イベント時の急激なトラフィック増にも耐えられる設計や、
+                  障害発生時に素早く復旧できる運用体制の構築に力を入れてきました。
+                  最近はコンテナ技術と IaC を活用したインフラの自動化・コード化を推進しています。
+                </p>
+                <div style={{ marginTop: 16, padding: "12px 14px", background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2, fontSize: 12, color: "#6b7199", lineHeight: 2 }}>
                   <span style={{ color: "#4a6cf7" }}>▸ 得意分野：</span>
-                  大規模ゲームイベント時の負荷対策 / リアルタイム通信基盤 / コンテナオーケストレーション
+                  AWS環境の構築・運用 / IaC (Terraform・Ansible) / コスト最適化
                 </div>
               </PixelBorder>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
-                {[
-                  { label: "総クエストクリア数", value: "47", sub: "プロジェクト完了" },
-                  { label: "最大同時接続耐性", value: "500K+", sub: "concurrent users" },
-                  { label: "インフラ稼働率", value: "99.99%", sub: "SLA達成" },
-                  { label: "デプロイ回数", value: "1,200+", sub: "CI/CD パイプライン" },
-                ].map((stat, i) => (
-                  <PixelBorder key={i} style={{ padding: "14px 16px", textAlign: "center" }}>
-                    <div style={{ color: "#6b7199", fontSize: 10, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>{stat.label}</div>
-                    <div style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 18, color: "#e2e8ff", textShadow: "0 0 8px #4a6cf744" }}>{stat.value}</div>
-                    <div style={{ color: "#4a6cf7", fontSize: 10, marginTop: 4 }}>{stat.sub}</div>
-                  </PixelBorder>
-                ))}
-              </div>
+
+              {/* Values / Policy */}
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                  🎯 POLICY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 大事にしていること</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
+                  {[
+                    { icon: "⬡", title: "Infrastructure as Code", desc: "手作業を排除し、インフラをコードで管理。再現性と変更履歴を確保する。", color: "#7B42BC" },
+                    { icon: "💰", title: "コスト意識のある設計", desc: "必要十分な構成を選び、無駄なリソースを持たない。実務でも月額80%削減を達成。", color: "#eab308" },
+                    { icon: "🛡", title: "障害に強い構成", desc: "落ちないインフラより、落ちても素早く復旧できるインフラを目指す。", color: "#22c55e" },
+                    { icon: "⟳", title: "自動化ファースト", desc: "繰り返す作業はすべて自動化。CI/CD・監視・アラート対応まで。", color: "#40BE46" },
+                  ].map((policy, i) => (
+                    <div key={i} style={{
+                      background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2,
+                      padding: isMobile ? "12px 12px" : "14px 16px",
+                      animation: "slideUp 0.4s ease both", animationDelay: `${i * 100}ms`,
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <span style={{ fontSize: 16, color: policy.color }}>{policy.icon}</span>
+                        <span style={{ color: "#e2e8ff", fontSize: 12, fontWeight: 600 }}>{policy.title}</span>
+                      </div>
+                      <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8 }}>{policy.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </PixelBorder>
+
+              {/* Infra Architecture Diagram */}
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px" }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                  🗺 ARCHITECTURE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— このサイトのインフラ構成</span>
+                </div>
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  gap: isMobile ? 4 : 8, flexWrap: "wrap", padding: isMobile ? "8px 0" : "12px 0",
+                }}>
+                  {[
+                    { name: "GitHub", color: "#c9d1d9", desc: "ソースコード管理" },
+                    { name: "→" },
+                    { name: "GitHub Actions", color: "#2088FF", desc: "自動ビルド & デプロイ" },
+                    { name: "→" },
+                    { name: "ECR", color: "#FF9900", desc: "Dockerイメージ保存" },
+                    { name: "→" },
+                    { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
+                    { name: "→" },
+                    { name: "ALB", color: "#FF9900", desc: "ロードバランサー" },
+                    { name: "→" },
+                    { name: "CloudFront", color: "#8c4fff", desc: "CDN・HTTPS終端" },
+                  ].map((item, i) => (
+                    item.name === "→" ? (
+                      <span key={i} style={{ color: "#2a2e4a", fontSize: isMobile ? 12 : 16 }}>→</span>
+                    ) : (
+                      <Tooltip key={i} text={item.desc} inline>
+                        <span style={{
+                          background: `${item.color}11`, color: item.color,
+                          border: `1px solid ${item.color}33`,
+                          padding: isMobile ? "4px 8px" : "6px 14px",
+                          borderRadius: 2, fontSize: isMobile ? 10 : 12,
+                          fontWeight: 500, whiteSpace: "nowrap", cursor: "help",
+                          transition: "all 0.2s",
+                        }}>{item.name}</span>
+                      </Tooltip>
+                    )
+                  ))}
+                </div>
+                <div style={{ textAlign: "center", color: "#4a5578", fontSize: 9, marginTop: 8 }}>
+                  ※ 各サービス名にホバーすると役割が表示されます
+                </div>
+              </PixelBorder>
             </div>
           )}
 
           {/* SKILLS */}
           {activeTab === "skills" && (
-            <PixelBorder style={{ padding: "20px 24px" }}>
+            <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
               <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>✦ SKILLS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 技術スキル</span></div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
                 {SKILLS.map((skill, i) => (
-                  <div key={skill.name} onClick={() => setSelectedSkill(selectedSkill === i ? null : i)} style={{
-                    background: selectedSkill === i ? "#1a1d30" : "#0f1229",
-                    border: `1px solid ${selectedSkill === i ? skill.color + "66" : "#1a1d30"}`,
+                  <div key={skill.name} onClick={() => setSelectedSkill(selectedSkill===i?null:i)} style={{
+                    background: selectedSkill===i?"#1a1d30":"#0f1229",
+                    border: `1px solid ${selectedSkill===i?skill.color+"66":"#1a1d30"}`,
                     borderRadius: 2, padding: "12px 14px", cursor: "pointer", transition: "all 0.2s",
-                    animation: "slideUp 0.4s ease both", animationDelay: `${i * 80}ms`,
+                    animation: "slideUp 0.4s ease both", animationDelay: `${i*80}ms`,
                   }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ fontSize: 16 }}>{skill.element}</span>
                         <span style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{skill.name}</span>
                       </div>
-                      <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: skill.color }}>
-                        {skill.years}yr
-                      </span>
+                      <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: skill.color }}>{skill.years}yr</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                       <span style={{ color: "#6b7199", fontSize: 9, flexShrink: 0 }}>経験 {skill.years}年</span>
                     </div>
                     <GaugeBar current={skill.years} max={MAX_YEARS} color={skill.color} height={8} showText={false} />
-                    {/* Tags always visible */}
                     <div style={{ display: "flex", gap: 4, marginTop: 10, flexWrap: "wrap" }}>
                       {skill.tags.map(tag => (
-                        <span key={tag} style={{
-                          fontSize: 9, color: skill.color, background: `${skill.color}11`,
-                          border: `1px solid ${skill.color}22`, padding: "1px 7px", borderRadius: 2,
-                        }}>{tag}</span>
+                        <span key={tag} style={{ fontSize: 9, color: skill.color, background: `${skill.color}11`, border: `1px solid ${skill.color}22`, padding: "1px 7px", borderRadius: 2 }}>{tag}</span>
                       ))}
                     </div>
                   </div>
@@ -551,41 +479,51 @@ export default function GamePortfolio() {
             </PixelBorder>
           )}
 
-          {/* QUESTS */}
+          {/* CAREER (Quests + Timeline merged) */}
           {activeTab === "quests" && (
-            <PixelBorder style={{ padding: "20px 24px" }}>
-              <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>⚑ CAREER <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— クエストログ</span></div>
-              {QUESTS.map((quest, i) => (
-                <div key={i} style={{
-                  background: "#0f1229", border: `1px solid ${quest.status === "active" ? "#4a6cf744" : "#1a1d30"}`,
-                  borderRadius: 2, padding: "16px 18px", marginBottom: 12, position: "relative",
-                  animation: "slideUp 0.4s ease both", animationDelay: `${i * 150}ms`,
-                }}>
-                  {quest.status === "active" && <div style={{ position: "absolute", top: 8, right: 12, background: "#22c55e22", color: "#22c55e", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 2, border: "1px solid #22c55e44", letterSpacing: 1 }}>ACTIVE</div>}
-                  {quest.status === "complete" && <div style={{ position: "absolute", top: 8, right: 12, color: "#6b7199", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>COMPLETE ✓</div>}
-                  <div style={{ color: "#e2e8ff", fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{quest.title}</div>
-                  <div style={{ color: "#4a6cf7", fontSize: 12, marginBottom: 2 }}>{quest.guild}</div>
-                  <div style={{ color: "#6b7199", fontSize: 10, marginBottom: 8 }}>{quest.period}</div>
-                  <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.8 }}>{quest.desc}</p>
+            <div>
+              <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px", marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>⚑ CAREER <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 職歴</span></div>
+                {QUESTS.map((quest, i) => (
+                  <div key={i} style={{
+                    background: "#0f1229", border: `1px solid ${quest.status==="active"?"#4a6cf744":"#1a1d30"}`,
+                    borderRadius: 2, padding: isMobile?"12px 14px":"16px 18px", marginBottom: 12, position: "relative",
+                    animation: "slideUp 0.4s ease both", animationDelay: `${i*150}ms`,
+                  }}>
+                    {quest.status==="active" && <div style={{ position: "absolute", top: 8, right: 10, background: "#22c55e22", color: "#22c55e", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 2, border: "1px solid #22c55e44", letterSpacing: 1 }}>ACTIVE</div>}
+                    {quest.status==="complete" && <div style={{ position: "absolute", top: 8, right: 10, color: "#6b7199", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>COMPLETE ✓</div>}
+                    <div style={{ color: "#e2e8ff", fontSize: isMobile?13:14, fontWeight: 600, marginBottom: 4, paddingRight: 70 }}>{quest.title}</div>
+                    <div style={{ color: "#4a6cf7", fontSize: 12, marginBottom: 2 }}>{quest.guild}</div>
+                    <div style={{ color: "#6b7199", fontSize: 10, marginBottom: 8 }}>{quest.period}</div>
+                    <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.8 }}>{quest.desc}</p>
+                  </div>
+                ))}
+              </PixelBorder>
+
+              {/* Activity timeline */}
+              <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 20 }}>
+                  ⏳ ACTIVITY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 活動・成果の記録</span>
                 </div>
-              ))}
-            </PixelBorder>
+                <ComingSoon icon="⏳" message="活動記録を準備中..." />
+              </PixelBorder>
+            </div>
           )}
 
           {/* INVENTORY */}
           {activeTab === "inventory" && (
-            <PixelBorder style={{ padding: "20px 24px" }}>
+            <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
               <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>◈ CERTIFICATIONS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 装備・資格</span></div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
                 {INVENTORY.map((item, i) => {
                   const r = RARITY_COLORS[item.rarity];
                   return (
                     <div key={i} style={{
                       background: "#0f1229", border: `1px solid ${r.bg}33`, borderRadius: 2,
                       padding: "14px 16px", position: "relative", overflow: "hidden",
-                      animation: "slideUp 0.4s ease both", animationDelay: `${i * 120}ms`,
+                      animation: "slideUp 0.4s ease both", animationDelay: `${i*120}ms`,
                     }}>
-                      {item.rarity === "legendary" && <div style={{ position: "absolute", inset: 0, background: `linear-gradient(90deg, transparent 30%, ${r.bg}0a 50%, transparent 70%)`, backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />}
+                      {item.rarity==="legendary" && <div style={{ position: "absolute", inset: 0, background: `linear-gradient(90deg, transparent 30%, ${r.bg}0a 50%, transparent 70%)`, backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />}
                       <div style={{ position: "relative", zIndex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -607,128 +545,74 @@ export default function GamePortfolio() {
 
           {/* LOG */}
           {activeTab === "log" && (
-            <PixelBorder style={{ padding: "20px 24px" }}>
+            <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
               <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>📖 BLOG <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 冒険記録</span></div>
-              {POSTS.map((post, i) => (
-                <div key={i} style={{
-                  background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2,
-                  padding: "14px 18px", marginBottom: 10, cursor: "pointer", transition: "all 0.2s",
-                  animation: "slideUp 0.4s ease both", animationDelay: `${i * 100}ms`,
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#4a6cf744"; e.currentTarget.style.background = "#12152a"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a1d30"; e.currentTarget.style.background = "#0f1229"; }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-                    <div style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 500 }}>
-                      <span style={{ color: "#4a6cf7", marginRight: 8 }}>▸</span>{post.title}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ color: "#eab308", fontSize: 10, fontWeight: 700, background: "#eab30811", padding: "2px 6px", borderRadius: 2 }}>+{post.exp} EXP</span>
-                      <span style={{ color: "#6b7199", fontSize: 11 }}>{post.date}</span>
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 6, marginTop: 10, flexWrap: "wrap" }}>
-                    {post.tags.map(tag => (
-                      <span key={tag} style={{ fontSize: 10, color: "#4a6cf7", background: "#4a6cf711", border: "1px solid #4a6cf722", padding: "1px 8px", borderRadius: 2 }}>{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              <ComingSoon icon="📖" message="冒険記録を準備中..." />
             </PixelBorder>
           )}
 
-          {/* ═══════════════════════════════════════════ */}
-          {/* TREASURY — COST DASHBOARD                  */}
-          {/* ═══════════════════════════════════════════ */}
+          {/* TREASURY */}
           {activeTab === "treasury" && (
+            <PixelBorder style={{ padding: isMobile?"16px 12px":"20px 24px" }}>
+              <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                💰 INFRA COST <span style={{ color: "#b4891888", fontWeight: 400, letterSpacing: 0 }}>— ギルド金庫</span>
+              </div>
+              <ComingSoon icon="💰" message="コストデータを準備中..." />
+            </PixelBorder>
+          )}
+
+          {/* CONTACT */}
+          {activeTab === "contact" && (
             <div>
-              {/* Header banner */}
-              <PixelBorder glowing style={{ padding: "20px 24px", marginBottom: 16, position: "relative", overflow: "hidden" }}>
-                {/* Gold shimmer bg */}
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: "linear-gradient(90deg, transparent 20%, #eab30806 50%, transparent 80%)",
-                  backgroundSize: "200% 100%",
-                  animation: "shimmer 4s linear infinite",
-                }} />
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                  ✉ CONTACT <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ギルド受付</span>
+                </div>
+                <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.9, marginBottom: 20 }}>
+                  お仕事のご依頼・技術的なご相談・カジュアル面談のお誘いなど、お気軽にどうぞ。
+                  <br />下記のいずれかからご連絡ください。
+                </p>
 
-                <div style={{ position: "relative", zIndex: 1 }}>
-                  <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
-                    💰 INFRA COST <span style={{ color: "#b4891888", fontWeight: 400, letterSpacing: 0 }}>— ギルド金庫</span>
-                  </div>
-                  <div style={{ color: "#6b7199", fontSize: 10, marginBottom: 16 }}>
-                    このサイトの実際のAWSインフラ維持費をリアルタイムで公開しています。
-                    <br />
-                    <span style={{ color: "#4a5578" }}>最終更新: {COST_DATA.lastUpdated} ｜ via AWS Cost Explorer API + Lambda</span>
-                  </div>
-
-                  {/* Big cost cards */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-                    {[
-                      { label: "今月の維持費", value: COST_DATA.monthlyTotal, icon: "🪙", sub: "Monthly Total" },
-                      { label: "本日の維持費", value: COST_DATA.todayCost, icon: "⚡", sub: "Today's Cost" },
-                      { label: "日平均コスト", value: COST_DATA.dailyAverage, icon: "📊", sub: "Daily Average" },
-                    ].map((card, i) => (
-                      <div key={i} style={{
-                        background: "#0f1229",
-                        border: "1px solid #eab30822",
-                        borderRadius: 2,
-                        padding: "14px 12px",
-                        textAlign: "center",
-                        animation: "countUp 0.5s ease both",
-                        animationDelay: `${i * 150}ms`,
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+                  {CONTACTS.map((c, i) => (
+                    <a key={c.name} href={c.url} target="_blank" rel="noopener noreferrer" style={{
+                      textDecoration: "none",
+                      background: "#0f1229", border: `1px solid ${c.color}22`, borderRadius: 2,
+                      padding: "16px 18px", display: "flex", alignItems: "center", gap: 14,
+                      cursor: "pointer", transition: "all 0.2s",
+                      animation: "slideUp 0.4s ease both", animationDelay: `${i * 80}ms`,
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = c.color + "66"; e.currentTarget.style.transform = "translateX(4px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = c.color + "22"; e.currentTarget.style.transform = "translateX(0)"; }}
+                    >
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 2,
+                        background: `${c.color}11`, border: `1px solid ${c.color}33`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 18, color: c.color, fontWeight: 700, flexShrink: 0,
                       }}>
-                        <div style={{ fontSize: 20, marginBottom: 4 }}>{card.icon}</div>
-                        <div style={{ color: "#6b7199", fontSize: 9, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>{card.label}</div>
-                        <div style={{
-                          fontFamily: "'Press Start 2P', monospace",
-                          fontSize: 18,
-                          color: "#eab308",
-                          animation: "goldGlow 3s ease infinite",
-                        }}>
-                          ${card.value.toFixed(2)}
-                        </div>
-                        <div style={{ color: "#4a5578", fontSize: 9, marginTop: 4 }}>{card.sub}</div>
+                        {c.icon}
                       </div>
-                    ))}
+                      <div>
+                        <div style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{c.name}</div>
+                        <div style={{ color: "#6b7199", fontSize: 10, marginTop: 2 }}>{c.desc}</div>
+                      </div>
+                      <span style={{ marginLeft: "auto", color: "#2a2e4a", fontSize: 16, flexShrink: 0 }}>→</span>
+                    </a>
+                  ))}
+                </div>
+              </PixelBorder>
+
+              <PixelBorder style={{ padding: isMobile ? "14px 14px" : "16px 24px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <span style={{ fontSize: 16, flexShrink: 0, marginTop: 2 }}>💬</span>
+                  <div>
+                    <div style={{ color: "#e2e8ff", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>返信について</div>
+                    <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8 }}>
+                      通常 1〜2 営業日以内にご返信いたします。<br />
+                      お急ぎの場合は Email にてご連絡ください。
+                    </p>
                   </div>
-                </div>
-              </PixelBorder>
-
-              {/* Service breakdown */}
-              <PixelBorder style={{ padding: "20px 24px", marginBottom: 16 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                  <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2 }}>
-                    ⚙ サービス別コスト内訳 <span style={{ color: "#4a5578", fontWeight: 400 }}>— 魔力消費量</span>
-                  </div>
-                  <span style={{ color: "#4a5578", fontSize: 9 }}>
-                    合計: <span style={{ color: "#eab308" }}>${COST_DATA.monthlyTotal.toFixed(2)}</span>
-                  </span>
-                </div>
-                <MiniBarChart services={COST_DATA.services} />
-              </PixelBorder>
-
-              {/* Daily trend */}
-              <PixelBorder style={{ padding: "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 12 }}>
-                  📈 日別コスト推移（直近30日）<span style={{ color: "#4a5578", fontWeight: 400 }}> — デイリーログ</span>
-                </div>
-                <SparkLine data={COST_DATA.dailyTrend} />
-              </PixelBorder>
-
-              {/* Monthly trend */}
-              <PixelBorder style={{ padding: "20px 24px" }}>
-                <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
-                  📅 月別コスト推移 <span style={{ color: "#4a5578", fontWeight: 400 }}>— シーズン報告</span>
-                </div>
-                <MonthlyTrendBars data={COST_DATA.monthlyTrend} />
-                <div style={{
-                  marginTop: 16, paddingTop: 12, borderTop: "1px solid #1a1d30",
-                  color: "#4a5578", fontSize: 10, lineHeight: 1.8,
-                }}>
-                  <span style={{ color: "#eab308" }}>💡 運用メモ（ギルドマスターより）：</span><br />
-                  個人ブログとしてはかなり低コストで運用できています。ECS Fargateの最小構成（0.25 vCPU / 0.5 GB）を使用中。
-                  このコストデータはLambda + Cost Explorer APIで毎日自動取得しています。
                 </div>
               </PixelBorder>
             </div>
@@ -740,11 +624,11 @@ export default function GamePortfolio() {
       {/* Footer */}
       <div style={{
         position: "relative", zIndex: 10, borderTop: "2px solid #1a1d30",
-        padding: "16px 24px", textAlign: "center", color: "#3a3f5c", fontSize: 10, letterSpacing: 1, background: "#080a14",
+        padding: "16px 24px", textAlign: "center", color: "#3a3f5c",
+        fontSize: 10, letterSpacing: 1, background: "#080a14",
       }}>
         © 2025 {STATS.name} — Built with React + Vite on ECS Fargate
-        <br />
-        <span style={{ color: "#2a2e4a" }}>☁ Powered by AWS — GAME OVER? NEVER.</span>
+        <br /><span style={{ color: "#2a2e4a" }}>☁ Powered by AWS — GAME OVER? NEVER.</span>
       </div>
     </div>
   );
