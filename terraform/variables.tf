@@ -54,3 +54,9 @@ variable "github_repository" {
   type        = string
   default     = "jishinzerogon/my-blog"
 }
+
+variable "enable_serving" {
+  description = "Whether to create serving resources (ALB, ECS service, CloudFront). Set false during dev to suspend and save cost."
+  type        = bool
+  default     = true
+}

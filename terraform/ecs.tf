@@ -41,6 +41,8 @@ resource "aws_ecs_task_definition" "main" {
 }
 
 resource "aws_ecs_service" "main" {
+  count = var.enable_serving ? 1 : 0
+
   name            = "${var.project}-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.main.arn

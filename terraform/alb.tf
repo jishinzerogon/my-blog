@@ -1,4 +1,6 @@
 resource "aws_lb" "main" {
+  count = var.enable_serving ? 1 : 0
+
   name               = "${var.project}-alb"
   internal           = false
   load_balancer_type = "application"
@@ -31,7 +33,9 @@ resource "aws_lb_target_group" "main" {
 }
 
 resource "aws_lb_listener" "main" {
-  load_balancer_arn = aws_lb.main.arn
+  count = var.enable_serving ? 1 : 0
+
+  load_balancer_arn = aws_lb.main[0].arn
   port              = 80
   protocol          = "HTTP"
 

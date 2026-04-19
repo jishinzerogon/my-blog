@@ -3,12 +3,14 @@ data "aws_cloudfront_cache_policy" "caching_optimized" {
 }
 
 resource "aws_cloudfront_distribution" "main" {
+  count = var.enable_serving ? 1 : 0
+
   enabled             = true
   default_root_object = "index.html"
   aliases             = [var.domain_name]
 
   origin {
-    domain_name = aws_lb.main.dns_name
+    domain_name = aws_lb.main[0].dns_name
     origin_id   = "ecs-nginx"
 
     custom_origin_config {
