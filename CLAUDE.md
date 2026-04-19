@@ -4,16 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## プロジェクト概要
 
-`jishinzerogon.dev` で公開されている個人ブログのインフラ一式。静的な nginx コンテナを AWS 上で動かし、Terraform で構成管理している。コードの読みやすさ・ベストプラクティスへの準拠を重視する。
+`jishinzerogon.dev` で公開されている個人ポートフォリオサイトのインフラ一式。React + Vite でビルドした SPA を nginx コンテナで配信し、AWS 上で動かしている。構成管理は Terraform。コードの読みやすさ・ベストプラクティスへの準拠を重視する。
 
 ## アーキテクチャ
 
 ```
-Route53 → CloudFront → ALB → ECS(Fargate, nginx) ← ECR
-                                           ACM (us-east-1 for CloudFront, ap-northeast-1 for ALB)
+Cloudflare DNS (ドメイン購入元 & ネームサーバ) → CloudFront → ALB → ECS(Fargate, nginx) ← ECR
+                                                                      ACM (us-east-1 for CloudFront, ap-northeast-1 for ALB)
 ```
 
-- **コンテナ**: `Dockerfile` は `nginx:alpine` に `html/index.html` と `nginx.conf` をコピーするだけのシンプル構成。
+- **DNS**: `jishinzerogon.dev` は Cloudflare で購入し、ネームサーバも Cloudflare のまま (Route53 は使わない)。Route53 への移管は Cloudflare の有料プラン要件により見送り済み。Terraform に DNS リソースは含めない。
+
+- **フロントエンド**: React 19 + Vite の SPA (`index.html`, `src/App.jsx`, `src/main.jsx`)。ゲーム UI 風のポートフォリオページ。`package.json` の `build` スクリプトで `dist/` を生成する。
+- **コンテナ**: `Dockerfile` はマルチステージビルド構成。ステージ 1 の `node:22-alpine` で `npm run build` を実行し、ステージ 2 の `nginx:alpine` に `dist/` と `nginx.conf` をコピーして配信する。
 - **Terraform** (`terraform/`): ファイルはリソース種別ごとに分割 (`vpc.tf`, `alb.tf`, `ecs.tf`, `cloudfront.tf`, `acm.tf`, `ecr.tf`, `iam.tf`, `cloudwatch.tf`, `security_group.tf`)。
   - バックエンドは S3 (`my-blog-tfstate-203369940478-ap-northeast-1-an`)。
   - プロバイダは ap-northeast-1 がデフォルト、CloudFront 用 ACM 証明書のために us-east-1 エイリアス (`aws.us_east_1`) を定義。
@@ -42,7 +45,19 @@ docker build -t my-blog .
 docker run --rm -p 8080:80 my-blog  # http://localhost:8080 で確認
 ```
 
-CI (`.github/workflows/ci.yml`) は main への push で Docker build のみ実行 (push やデプロイは未設定)。
+フロントエンドのローカル開発:
+
+```bash
+npm install
+npm run dev      # Vite 開発サーバ起動
+npm run build    # dist/ を生成
+```
+
+GitHub Actions ワークフロー (`.github/workflows/`):
+
+- `ci.yml` — PR 時に Docker build を検証 (アプリ側の build チェック)
+- `terraform-ci.yml` — `terraform/**` を変更した PR で fmt / validate / plan を実行 (OIDC で AWS 認証)
+- `deploy.yml` — `main` への push で ECR に image push → ECS `update-service --force-new-deployment` → `wait services-stable` でデプロイ完了待機 (OIDC で AWS 認証)
 
 ## 編集時の注意
 

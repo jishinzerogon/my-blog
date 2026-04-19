@@ -405,39 +405,62 @@ export default function GamePortfolio() {
                 <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   🗺 ARCHITECTURE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— このサイトのインフラ構成</span>
                 </div>
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  gap: isMobile ? 4 : 8, flexWrap: "wrap", padding: isMobile ? "8px 0" : "12px 0",
-                }}>
-                  {[
-                    { name: "GitHub", color: "#c9d1d9", desc: "ソースコード管理" },
-                    { name: "→" },
-                    { name: "GitHub Actions", color: "#2088FF", desc: "自動ビルド & デプロイ" },
-                    { name: "→" },
-                    { name: "ECR", color: "#FF9900", desc: "Dockerイメージ保存" },
-                    { name: "→" },
-                    { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
-                    { name: "→" },
-                    { name: "ALB", color: "#FF9900", desc: "ロードバランサー" },
-                    { name: "→" },
-                    { name: "CloudFront", color: "#8c4fff", desc: "CDN・HTTPS終端" },
-                  ].map((item, i) => (
-                    item.name === "→" ? (
-                      <span key={i} style={{ color: "#2a2e4a", fontSize: isMobile ? 12 : 16 }}>→</span>
-                    ) : (
-                      <Tooltip key={i} text={item.desc} inline>
-                        <span style={{
-                          background: `${item.color}11`, color: item.color,
-                          border: `1px solid ${item.color}33`,
-                          padding: isMobile ? "4px 8px" : "6px 14px",
-                          borderRadius: 2, fontSize: isMobile ? 10 : 12,
-                          fontWeight: 500, whiteSpace: "nowrap", cursor: "help",
-                          transition: "all 0.2s",
-                        }}>{item.name}</span>
-                      </Tooltip>
-                    )
-                  ))}
-                </div>
+
+                {[
+                  {
+                    label: "🌐 ACCESS FLOW",
+                    sub: "ユーザーのアクセス経路",
+                    nodes: [
+                      { name: "Cloudflare DNS", color: "#F38020", desc: "ドメイン購入元 & ネームサーバ" },
+                      { name: "CloudFront", color: "#8c4fff", desc: "CDN・HTTPS終端" },
+                      { name: "ALB", color: "#FF9900", desc: "ロードバランサー" },
+                      { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
+                    ],
+                  },
+                  {
+                    label: "🚀 DEPLOY FLOW",
+                    sub: "デプロイ経路",
+                    nodes: [
+                      { name: "GitHub", color: "#c9d1d9", desc: "ソースコード管理" },
+                      { name: "GitHub Actions", color: "#2088FF", desc: "自動ビルド & デプロイ" },
+                      { name: "ECR", color: "#FF9900", desc: "Dockerイメージ保存" },
+                      { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
+                    ],
+                  },
+                ].map((flow, fi) => (
+                  <div key={fi} style={{ marginBottom: fi === 0 ? 18 : 0 }}>
+                    <div style={{ color: "#6b7199", fontSize: 10, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>
+                      {flow.label}
+                      <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0, marginLeft: 6 }}>— {flow.sub}</span>
+                    </div>
+                    <div style={{
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      gap: isMobile ? 4 : 8, flexWrap: "wrap", padding: isMobile ? "6px 0" : "10px 0",
+                    }}>
+                      {flow.nodes.flatMap((node, ni) => {
+                        const items = [
+                          <Tooltip key={`n-${ni}`} text={node.desc} inline>
+                            <span style={{
+                              background: `${node.color}11`, color: node.color,
+                              border: `1px solid ${node.color}33`,
+                              padding: isMobile ? "4px 8px" : "6px 14px",
+                              borderRadius: 2, fontSize: isMobile ? 10 : 12,
+                              fontWeight: 500, whiteSpace: "nowrap", cursor: "help",
+                              transition: "all 0.2s",
+                            }}>{node.name}</span>
+                          </Tooltip>,
+                        ];
+                        if (ni < flow.nodes.length - 1) {
+                          items.push(
+                            <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 12 : 16 }}>→</span>
+                          );
+                        }
+                        return items;
+                      })}
+                    </div>
+                  </div>
+                ))}
+
                 <div style={{ textAlign: "center", color: "#4a5578", fontSize: 9, marginTop: 8 }}>
                   ※ 各サービス名にホバーすると役割が表示されます
                 </div>
