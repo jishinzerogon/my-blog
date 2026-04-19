@@ -4,10 +4,12 @@
 
 ## アーキテクチャ
 
+### アクセス経路 (ユーザーがサイトに到達するまで)
+
 ```
-              ┌────────────┐
-   ユーザ ──▶ │  Route 53  │
-              └─────┬──────┘
+              ┌──────────────────┐
+   ユーザ ──▶ │  Cloudflare DNS  │  ドメイン購入元 & ネームサーバ
+              └─────┬────────────┘
                     │
               ┌─────▼──────┐
               │ CloudFront │ ◀── ACM (us-east-1)
@@ -20,17 +22,37 @@
               ┌─────▼──────────────────┐
               │  ECS Service (Fargate) │ ──▶ CloudWatch Logs
               │   nginx:alpine         │
-              └─────┬──────────────────┘
-                    │ image pull
+              └────────────────────────┘
+```
+
+### デプロイ経路 (コミットから本番反映まで)
+
+```
+              ┌────────────┐
+              │   GitHub   │  main push
+              └─────┬──────┘
+                    │ OIDC (鍵レス)
+              ┌─────▼──────────┐
+              │ GitHub Actions │  build & deploy
+              └─────┬──────────┘
+                    │ docker push
               ┌─────▼──────┐
               │    ECR     │
-              └────────────┘
+              └─────┬──────┘
+                    │ image pull (update-service --force-new-deployment)
+              ┌─────▼──────────────────┐
+              │  ECS Service (Fargate) │
+              └────────────────────────┘
 ```
+
+> ℹ️ ドメイン `jishinzerogon.dev` は Cloudflare で購入しており、ネームサーバも Cloudflare のまま利用している。Route 53 への移管も検討したが、Cloudflare 側で有料プランが必要となるため見送り、DNS は Cloudflare、CDN 以降は AWS という構成を採用している。
 
 ## 使用技術
 
+### DNS (AWS 外)
+- **Cloudflare DNS** — ドメイン `jishinzerogon.dev` の購入元 & ネームサーバ。CloudFront ディストリビューションへ CNAME で向けている
+
 ### AWS
-- **Route 53** — DNS
 - **CloudFront** — CDN・HTTPS 終端
 - **ACM** — TLS 証明書 (CloudFront 用は us-east-1、ALB 用は ap-northeast-1 の 2 リージョンで管理)
 - **ALB** — L7 ロードバランサ
@@ -43,7 +65,8 @@
 
 ### ツール
 - **Terraform** — IaC (リソース種別ごとにファイル分割、変数は `variables.tf` に集約)
-- **Docker** — `nginx:alpine` ベースの軽量コンテナ
+- **Docker** — マルチステージビルド (Node でビルド → `nginx:alpine` で配信)
+- **React + Vite** — ポートフォリオ SPA のフロントエンド
 - **GitHub Actions** — CI / CD
 
 ## 設計のポイント
@@ -65,6 +88,15 @@
 - **State の S3 バックエンド管理**: ローカルに state を置かず、S3 をリモートバックエンドとして使用
 
 ## ローカル開発
+
+### フロントエンド (React + Vite)
+
+```bash
+npm install
+npm run dev        # 開発サーバ起動 (HMR)
+npm run build      # dist/ に本番ビルド
+npm run preview    # ビルド成果物をローカルプレビュー
+```
 
 ### コンテナのビルド・動作確認
 
@@ -89,12 +121,18 @@ terraform validate  # 構文チェック
 
 ```
 .
-├── Dockerfile           # nginx:alpine ベース
-├── nginx.conf           # nginx サーバ設定
-├── html/                # 配信する静的コンテンツ
-├── terraform/           # AWS インフラ定義 (リソース種別ごとにファイル分割)
-│   ├── main.tf          # provider, backend
+├── Dockerfile              # マルチステージ (Node でビルド → nginx:alpine で配信)
+├── nginx.conf              # nginx サーバ設定
+├── index.html              # Vite エントリ HTML
+├── vite.config.js
+├── package.json            # React 19 + Vite
+├── src/                    # ポートフォリオ SPA のソース
+│   ├── main.jsx
+│   └── App.jsx
+├── terraform/              # AWS インフラ定義 (リソース種別ごとにファイル分割)
+│   ├── main.tf             # provider, backend
 │   ├── variables.tf
+│   ├── outputs.tf
 │   ├── vpc.tf
 │   ├── security_group.tf
 │   ├── alb.tf
@@ -102,9 +140,10 @@ terraform validate  # 構文チェック
 │   ├── ecr.tf
 │   ├── cloudfront.tf
 │   ├── acm.tf
-│   ├── iam.tf           # ECS 実行ロール、GitHub Actions OIDC ロール
+│   ├── iam.tf              # ECS 実行ロール、GitHub Actions OIDC ロール
 │   └── cloudwatch.tf
 └── .github/workflows/
-    ├── ci.yml           # PR 時: build 検証
-    └── deploy.yml       # main push 時: build → ECR push → ECS デプロイ
+    ├── ci.yml              # PR 時: Docker build 検証
+    ├── terraform-ci.yml    # terraform/** 変更 PR: fmt / validate / plan
+    └── deploy.yml          # main push 時: build → ECR push → ECS デプロイ
 ```
