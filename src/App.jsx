@@ -7,15 +7,16 @@ const STATS = {
   titleTooltip: "Lv = エンジニア歴（年数）",
   subtitle: "Corporate IT → Server-Side Engineer → Infrastructure Engineer",
   hp: { current: 999, max: 999, label: "HP", tooltip: "やる気 — モチベーション" },
-  mp: { current: 6, max: 8, label: "MP", tooltip: "実務経験のある技術領域 — 6/8 領域" },
+  mp: { current: 7, max: 9, label: "MP", tooltip: "実務経験のある技術領域 — 7/9 領域" },
   exp: { current: 6, max: 10, label: "EXP", tooltip: "エンジニア歴 — 6年目" },
 };
 
 const MAX_YEARS = 6;
 
 const SKILLS = [
-  { name: "Linux", years: 6, element: "🐧", color: "#FCC624", tags: ["Amazon Linux", "CentOS"] },
-  { name: "AWS", years: 2, element: "☁", color: "#FF9900", tags: ["EC2", "VPC", "ELB", "RDS", "Lambda", "API Gateway", "Route53"] },
+  { name: "Linux", years: 6, element: "🐧", color: "#FCC624", tags: ["Amazon Linux 2 / 2023", "CentOS"] },
+  { name: "AWS", years: 2, element: "☁", color: "#FF9900", tags: ["EC2", "VPC", "ELB", "RDS", "ElastiCache", "Lambda", "API Gateway", "SES", "SNS", "CloudWatch", "IAM", "S3", "Route53"] },
+  { name: "RDBMS", years: 2, element: "🗄", color: "#00758F", tags: ["MySQL", "Amazon Aurora MySQL"] },
   { name: "Terraform", years: 2, element: "⬡", color: "#7B42BC", tags: ["State管理", "モジュール化", "リファクタリング"] },
   { name: "Ansible", years: 2, element: "⚙", color: "#EE0000", tags: ["Playbook", "role設計", "inventory", "リファクタリング"] },
   { name: "Monitoring", years: 2, element: "👁", color: "#E6522C", tags: ["Prometheus", "Grafana", "Alertmanager", "Zabbix"] },
@@ -25,9 +26,9 @@ const SKILLS = [
 ];
 
 const QUESTS = [
-  { period: "2024 - Present", title: "☆ インフラエンジニア", guild: "ゲーム会社（現職）", desc: "AWS環境でのゲームインフラ構築・運用。Terraform/Ansibleによるコード化、Prometheus/Grafanaでの監視基盤構築。サーバ縮退プロジェクトを主導し、月額インフラコスト約80%削減を達成。", status: "active" },
-  { period: "2023", title: "★ Web開発エンジニア", guild: "ゲーム会社", desc: "Ruby on Railsを用いたゲームポータルサイトの開発・保守。キャンペーン施策によるWeb変更、会社譲渡に伴うドメイン・SSL対応など。", status: "complete" },
-  { period: "2020 - 2022", title: "★ 社内SE", guild: "ゲーム会社", desc: "社内PCの管理・キッティング、ヘルプデスク、オンプレミスサーバーの構築・運用。ITインフラの基礎を習得。", status: "complete" },
+  { period: "2024 - Present", title: "☆ インフラエンジニア", guild: "ゲーム会社 (自社開発・運営 / 現職)", desc: "AWS / オンプレミス環境のインフラ構築・運用、およびコスト最適化を担当。IaC による自動化を推進。", status: "active" },
+  { period: "2023", title: "★ Web開発エンジニア", guild: "ゲーム会社 (運営)", desc: "ゲームポータルサイトの開発・運用・保守 (Rails / ASP.NET)。", note: "※ 前職の社内SEから関連会社へ転籍し、職種転換。", status: "complete" },
+  { period: "2020 - 2022", title: "★ 社内SE", guild: "ゲーム会社 (運営)", desc: "社内 PC・サーバー・アカウントの管理と運用。オンプレミスサーバー構築・運用、および VMware 仮想環境の運用・仮想化プロジェクトのサポート経験を積む。", status: "complete" },
 ];
 
 const INVENTORY = [
@@ -44,7 +45,29 @@ const RARITY_COLORS = {
   rare: { bg: "#3b82f6", text: "#001a33", glow: "#3b82f666", label: "★★★☆☆" },
 };
 
-const TIMELINE = [];
+const TIMELINE = [
+  // ▼ 個人開発 (my-blog)
+  { date: "2026-04-16", type: "personal", title: "React + Vite でポートフォリオページを実装", desc: "ゲーム UI 風のポートフォリオページを Vite で構築。Docker イメージに同梱して ECS Fargate で配信。" },
+  { date: "2026-04-14", type: "personal", title: "GitHub Actions による ECS 自動デプロイ", desc: "OIDC で AWS 認証し、ECR push → ECS update-service --force-new-deployment → wait services-stable まで自動化。" },
+  { date: "2026-04-04", type: "personal", title: "AWS インフラ構築 (VPC / ALB / ECS Fargate / CloudFront)", desc: "Terraform でゼロから AWS 環境を構築。CloudFront → ALB → ECS Fargate (nginx) の配信経路を開通。" },
+
+  // ▼ 業務実績
+  { date: "2026-04〜", type: "work", ongoing: true, title: "オンプレミスサーバーの AWS S3 バックアップ基盤構築", desc: "10 年以上稼働する既存オンプレサーバーのバックアップ先として、AWS S3 を新たに採用する移行プロジェクトを主担当で推進中。EC2 + rclone による転送基盤の設計・検討を進めている。" },
+  { date: "2026-03", type: "work", title: "AWS SES の bounce / complaint 監視基盤を構築", desc: "メール送信時の bounce (配信失敗) / complaint (苦情) 情報を SES → SNS → Lambda で整形して CloudWatch Logs に集約し、閾値超過時は Google Chat へ通知するモジュールを実装。送信レピュテーション低下 (最悪の場合は SES 送信停止) の前兆を早期検知できる仕組み。その後、AWS で運営している SES 利用タイトル全てに横展開。" },
+  // TODO: 削減額・EC2/RDS 台数などの具体数値を確認でき次第、desc に追記する
+  { date: "2026-01", type: "work", title: "稼働中ゲーム 3 タイトル目のコスト削減 (最大規模)", desc: "前 2 タイトルからの連続で、3 件目のゲームタイトルでインフラ縮退・コスト最適化を実施。これまでで最大規模の環境に対して、確立した手法を踏襲しつつ適用範囲を拡大。" },
+  { date: "2025-09", type: "work", title: "稼働中ゲーム 2 タイトルのコスト削減プロジェクト主導", desc: "インフラ主担当 (5 名体制) として、2 タイトル連続で月額 AWS コストを約 80% 削減。EC2 / RDS の統合、ELB・ElastiCache 撤去と EC2 ローカル Redis への切替、Let's Encrypt による SSL 証明書の自動更新・配布基盤を構築。運営・経営層との合意形成、開発チームとの折衝を主導。" },
+  { date: "2025-07", type: "work", title: "オンプレミス環境の SSL 証明書更新を完全自動化", desc: "手動で購入・適用していた SSL 証明書運用を、ZeroSSL + acme.sh で完全自動化。各サーバへの配布スクリプトと、失敗時に Google Chat へ通知する監視まで実装し、人手を介さない運用体制を構築。古い端末のユーザーが多いタイトル特性を踏まえ、互換性を優先して Let's Encrypt ではなく ZeroSSL を選定。有料証明書からの切替でコストも削減。" },
+  { date: "2024-12", type: "work", title: "新規スマホ向け RPG の AWS インフラ構築", desc: "インフラチーム 2 名のメイン担当 (全体 20 名体制) として、EC2 12 台規模の冗長化設計から Terraform + Ansible での IaC、Prometheus / Grafana / Alertmanager による監視基盤まで構築。Lambda + API Gateway でワンクリック起動/停止 URL を独自開発し、Aurora Serverless v2 と組み合わせて開発環境コストを最適化。" },
+  { date: "2024-01", type: "work", title: "インフラエンジニアへキャリアチェンジ", desc: "既存ゲームタイトルのインフラ運用保守を担当しながら、未経験から Terraform / Ansible を習得。既存 IaC コードの読み解きとリファクタリングを通じて、後続の新規構築プロジェクトを主担当するための技術基盤を整えた。" },
+  { date: "2023-01", type: "work", title: "Web 開発エンジニア", desc: "ゲームポータルサイトの開発・運用・保守 (Rails / ASP.NET)。10 タイトル以上のコピーライト・ドメイン・SSL 証明書の更新、オンプレ環境からクラウド環境への Web サーバ移行を実施。" },
+  { date: "2020-05", type: "work", title: "社内 SE (キャリアスタート)", desc: "社内 PC の管理・キッティング、ヘルプデスク、オンプレミスサーバー・アカウント管理全般を担当。IT インフラの基礎とユーザーサポート業務を経験。" },
+];
+
+const TIMELINE_TYPES = {
+  work: { color: "#4a6cf7", label: "業務" },
+  personal: { color: "#22c55e", label: "個人" },
+};
 
 const CONTACTS = [
   { name: "GitHub", icon: "◈", url: "https://github.com/jishinzerogon", color: "#c9d1d9", desc: "ソースコード & コントリビューション" },
@@ -519,6 +542,9 @@ export default function GamePortfolio() {
                     <div style={{ color: "#4a6cf7", fontSize: 12, marginBottom: 2 }}>{quest.guild}</div>
                     <div style={{ color: "#6b7199", fontSize: 10, marginBottom: 8 }}>{quest.period}</div>
                     <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.8 }}>{quest.desc}</p>
+                    {quest.note && (
+                      <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8, marginTop: 6 }}>{quest.note}</p>
+                    )}
                   </div>
                 ))}
               </PixelBorder>
@@ -528,7 +554,56 @@ export default function GamePortfolio() {
                 <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 20 }}>
                   ⏳ ACTIVITY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 活動・成果の記録</span>
                 </div>
-                <ComingSoon icon="⏳" message="活動記録を準備中..." />
+
+                {/* Legend */}
+                <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+                  {Object.entries(TIMELINE_TYPES).map(([key, t]) => (
+                    <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ width: 8, height: 8, borderRadius: "50%", background: t.color, boxShadow: `0 0 6px ${t.color}66` }} />
+                      <span style={{ color: "#6b7199", fontSize: 10 }}>{t.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Timeline */}
+                <div style={{ position: "relative", paddingLeft: isMobile ? 18 : 22 }}>
+                  <div style={{
+                    position: "absolute", left: isMobile ? 4 : 5, top: 6, bottom: 6,
+                    width: 2, background: "#1a1d30",
+                  }} />
+                  {TIMELINE.map((event, i) => {
+                    const t = TIMELINE_TYPES[event.type] || TIMELINE_TYPES.personal;
+                    return (
+                      <div key={i} style={{
+                        position: "relative", marginBottom: i === TIMELINE.length - 1 ? 0 : 16,
+                        animation: "slideUp 0.4s ease both", animationDelay: `${i * 50}ms`,
+                      }}>
+                        <div style={{
+                          position: "absolute", left: isMobile ? -16 : -20, top: 5,
+                          width: 10, height: 10, background: t.color,
+                          border: "2px solid #0c0e1a", borderRadius: "50%",
+                          boxShadow: `0 0 6px ${t.color}88`,
+                        }} />
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                          <span style={{ color: "#6b7199", fontSize: 10, fontFamily: "'Press Start 2P', monospace" }}>{event.date}</span>
+                          <span style={{
+                            fontSize: 9, color: t.color, background: `${t.color}11`,
+                            border: `1px solid ${t.color}44`, padding: "1px 7px", borderRadius: 2, letterSpacing: 1,
+                          }}>{t.label}</span>
+                          {event.ongoing && (
+                            <span style={{
+                              fontSize: 9, color: "#eab308", background: "#eab30822",
+                              border: "1px solid #eab30866", padding: "1px 7px", borderRadius: 2, letterSpacing: 1,
+                              animation: "goldGlow 2s ease infinite", fontWeight: 700,
+                            }}>進行中</span>
+                          )}
+                        </div>
+                        <div style={{ color: "#e2e8ff", fontSize: isMobile ? 12 : 13, fontWeight: 600, marginBottom: 4 }}>{event.title}</div>
+                        <p style={{ color: "#8890b5", fontSize: 11, lineHeight: 1.7 }}>{event.desc}</p>
+                      </div>
+                    );
+                  })}
+                </div>
               </PixelBorder>
             </div>
           )}
