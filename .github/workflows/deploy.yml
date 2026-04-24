@@ -11,7 +11,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-1
-  AWS_ROLE_ARN: arn:aws:iam::203369940478:role/my-blog-github-actions-role
+  AWS_ROLE_ARN: arn:aws:iam::203369940478:role/my-blog-github-actions-deploy-role
   ECR_REPOSITORY: my-blog
   ECS_CLUSTER: my-blog-cluster
   ECS_SERVICE: my-blog-service
