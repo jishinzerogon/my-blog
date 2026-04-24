@@ -38,9 +38,76 @@ resource "aws_iam_openid_connect_provider" "github" {
   }
 }
 
-# GitHub Actions が引き受けるデプロイ用 Role
-resource "aws_iam_role" "github_actions" {
-  name = "${var.project}-github-actions-role"
+# main への push でのみ引き受けられるデプロイ用 Role (write 権限)
+resource "aws_iam_role" "github_actions_deploy" {
+  name = "${var.project}-github-actions-deploy-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:ref:refs/heads/main"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.project}-github-actions-deploy-role"
+  }
+}
+
+resource "aws_iam_role_policy" "github_actions_deploy" {
+  name = "${var.project}-github-actions-deploy-policy"
+  role = aws_iam_role.github_actions_deploy.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "EcrAuth"
+        Effect   = "Allow"
+        Action   = "ecr:GetAuthorizationToken"
+        Resource = "*"
+      },
+      {
+        Sid    = "EcrPush"
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:CompleteLayerUpload",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart",
+        ]
+        Resource = aws_ecr_repository.my_blog.arn
+      },
+      {
+        Sid    = "EcsDeploy"
+        Effect = "Allow"
+        Action = [
+          "ecs:UpdateService",
+          "ecs:DescribeServices",
+        ]
+        Resource = "arn:aws:ecs:${var.region}:*:service/${var.project}-cluster/${var.project}-service"
+      },
+    ]
+  })
+}
+
+# PR でのみ引き受けられる terraform plan 用 Role (read-only)
+resource "aws_iam_role" "github_actions_plan" {
+  name = "${var.project}-github-actions-plan-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -56,10 +123,7 @@ resource "aws_iam_role" "github_actions" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
           StringLike = {
-            "token.actions.githubusercontent.com:sub" = [
-              "repo:${var.github_repository}:ref:refs/heads/main",
-              "repo:${var.github_repository}:pull_request",
-            ]
+            "token.actions.githubusercontent.com:sub" = "repo:${var.github_repository}:pull_request"
           }
         }
       }
@@ -67,13 +131,13 @@ resource "aws_iam_role" "github_actions" {
   })
 
   tags = {
-    Name = "${var.project}-github-actions-role"
+    Name = "${var.project}-github-actions-plan-role"
   }
 }
 
-resource "aws_iam_role_policy" "github_actions" {
-  name = "${var.project}-github-actions-policy"
-  role = aws_iam_role.github_actions.id
+resource "aws_iam_role_policy" "github_actions_plan" {
+  name = "${var.project}-github-actions-plan-policy"
+  role = aws_iam_role.github_actions_plan.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -118,34 +182,6 @@ resource "aws_iam_role_policy" "github_actions" {
           "iam:GetOpenIDConnectProvider",
         ]
         Resource = "*"
-      },
-      {
-        Sid      = "EcrAuth"
-        Effect   = "Allow"
-        Action   = "ecr:GetAuthorizationToken"
-        Resource = "*"
-      },
-      {
-        Sid    = "EcrPush"
-        Effect = "Allow"
-        Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:BatchGetImage",
-          "ecr:CompleteLayerUpload",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart",
-        ]
-        Resource = aws_ecr_repository.my_blog.arn
-      },
-      {
-        Sid    = "EcsDeploy"
-        Effect = "Allow"
-        Action = [
-          "ecs:UpdateService",
-          "ecs:DescribeServices",
-        ]
-        Resource = "arn:aws:ecs:${var.region}:*:service/${var.project}-cluster/${var.project}-service"
       },
     ]
   })
