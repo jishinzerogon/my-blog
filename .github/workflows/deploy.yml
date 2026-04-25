@@ -48,5 +48,5 @@ jobs:
       - name: CloudFront キャッシュを無効化
         run: |
           aws cloudfront create-invalidation \
-            --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+            --distribution-id $E2PJGY8HMFUV66 \
             --paths "/*"
