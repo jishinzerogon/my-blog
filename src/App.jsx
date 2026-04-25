@@ -69,6 +69,35 @@ const TIMELINE_TYPES = {
   personal: { color: "#22c55e", label: "個人" },
 };
 
+const INFRA_VERSIONS = [
+  {
+    version: "v1.0",
+    date: "2026-04",
+    title: "初期構成 — ECS Fargate でコンテナ配信",
+    status: "past",
+    flow: ["Cloudflare DNS", "CloudFront", "ALB", "ECS Fargate (nginx)"],
+    why: "コンテナ運用 + Terraform IaC を題材として学習するために採用。",
+    note: "ALB の固定費 (~$22/月) が遊休時に効くため、開発外は手動で destroy する運用でしのいでいた。",
+  },
+  {
+    version: "v2.0",
+    date: "2026-04-25",
+    title: "S3 + CloudFront へ移行 — OAC で静的配信",
+    status: "current",
+    flow: ["Cloudflare DNS", "CloudFront", "S3 (OAC)"],
+    why: "静的 SPA に最適化。OAC で S3 を private に保ったまま CloudFront 経由のみアクセス許可。",
+    note: "固定費が実質ゼロに (CloudFront Always Free 枠で月 $0.10 以下)。Phase 2 で Rails API を /api/* に追加できるよう ECS リソース定義は残置。",
+  },
+  {
+    version: "Phase 2",
+    date: "予定",
+    title: "Rails API 追加 — 動的エンドポイントを ECS で再活用",
+    status: "planned",
+    flow: ["CloudFront", "/api/* → ALB", "ECS (Rails)", "+ 既存 S3"],
+    why: "アクセスカウンタ等の動的処理用に Rails API を追加。CloudFront に /api/* ビヘイビア追加で既存 ALB+ECS を再利用。",
+  },
+];
+
 const CONTACTS = [
   { name: "GitHub", icon: "◈", url: "https://github.com/jishinzerogon", color: "#c9d1d9", desc: "ソースコード & コントリビューション" },
 ];
@@ -424,7 +453,7 @@ export default function GamePortfolio() {
               </PixelBorder>
 
               {/* Infra Architecture Diagram */}
-              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px" }}>
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
                 <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   🗺 ARCHITECTURE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— このサイトのインフラ構成</span>
                 </div>
@@ -435,9 +464,8 @@ export default function GamePortfolio() {
                     sub: "ユーザーのアクセス経路",
                     nodes: [
                       { name: "Cloudflare DNS", color: "#F38020", desc: "ドメイン購入元 & ネームサーバ" },
-                      { name: "CloudFront", color: "#8c4fff", desc: "CDN・HTTPS終端" },
-                      { name: "ALB", color: "#FF9900", desc: "ロードバランサー" },
-                      { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
+                      { name: "CloudFront", color: "#8c4fff", desc: "CDN・HTTPS終端・SPA フォールバック" },
+                      { name: "S3 (OAC)", color: "#569A31", desc: "静的ファイル配信 (private、CloudFront からのみアクセス許可)" },
                     ],
                   },
                   {
@@ -445,9 +473,9 @@ export default function GamePortfolio() {
                     sub: "デプロイ経路",
                     nodes: [
                       { name: "GitHub", color: "#c9d1d9", desc: "ソースコード管理" },
-                      { name: "GitHub Actions", color: "#2088FF", desc: "自動ビルド & デプロイ" },
-                      { name: "ECR", color: "#FF9900", desc: "Dockerイメージ保存" },
-                      { name: "ECS Fargate", color: "#FF9900", desc: "コンテナ実行環境" },
+                      { name: "GitHub Actions", color: "#2088FF", desc: "npm build & AWS OIDC 認証" },
+                      { name: "S3", color: "#569A31", desc: "aws s3 sync で静的ファイルをアップロード" },
+                      { name: "CloudFront", color: "#8c4fff", desc: "create-invalidation で CDN キャッシュ無効化" },
                     ],
                   },
                 ].map((flow, fi) => (
@@ -487,6 +515,71 @@ export default function GamePortfolio() {
                 <div style={{ textAlign: "center", color: "#4a5578", fontSize: 9, marginTop: 8 }}>
                   ※ 各サービス名にホバーすると役割が表示されます
                 </div>
+              </PixelBorder>
+
+              {/* Infra History */}
+              <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px" }}>
+                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                  🕰 INFRA HISTORY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— インフラ変遷</span>
+                </div>
+
+                {INFRA_VERSIONS.map((v, i) => {
+                  const statusColor = v.status === "current" ? "#22c55e" : v.status === "planned" ? "#eab308" : "#6b7199";
+                  const statusLabel = v.status === "current" ? "CURRENT" : v.status === "planned" ? "PLANNED" : "PAST";
+                  return (
+                    <div key={i} style={{
+                      background: "#0f1229",
+                      border: `1px solid ${statusColor}33`,
+                      borderRadius: 2,
+                      padding: isMobile ? "12px 14px" : "14px 18px",
+                      marginBottom: i === INFRA_VERSIONS.length - 1 ? 0 : 12,
+                      animation: "slideUp 0.4s ease both",
+                      animationDelay: `${i * 100}ms`,
+                      position: "relative",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+                        <span style={{
+                          color: statusColor, fontSize: 10, fontWeight: 700,
+                          fontFamily: "'Press Start 2P', monospace", letterSpacing: 1,
+                        }}>{v.version}</span>
+                        <span style={{ color: "#6b7199", fontSize: 10 }}>{v.date}</span>
+                        <span style={{
+                          fontSize: 9, color: statusColor, background: `${statusColor}22`,
+                          border: `1px solid ${statusColor}55`, padding: "1px 7px", borderRadius: 2, letterSpacing: 1, fontWeight: 700,
+                        }}>{statusLabel}</span>
+                      </div>
+                      <div style={{ color: "#e2e8ff", fontSize: isMobile ? 12 : 13, fontWeight: 600, marginBottom: 8 }}>{v.title}</div>
+
+                      <div style={{
+                        display: "flex", alignItems: "center", flexWrap: "wrap",
+                        gap: isMobile ? 4 : 6, margin: "8px 0 10px",
+                        padding: "8px 10px", background: "#080a14", border: "1px solid #1a1d30", borderRadius: 2,
+                      }}>
+                        {v.flow.flatMap((node, ni) => {
+                          const items = [
+                            <span key={`n-${ni}`} style={{
+                              color: "#8890b5", fontSize: isMobile ? 10 : 11,
+                              whiteSpace: "nowrap",
+                            }}>{node}</span>,
+                          ];
+                          if (ni < v.flow.length - 1) {
+                            items.push(
+                              <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 10 : 12 }}>→</span>
+                            );
+                          }
+                          return items;
+                        })}
+                      </div>
+
+                      <p style={{ color: "#8890b5", fontSize: 11, lineHeight: 1.7 }}>
+                        <span style={{ color: statusColor }}>▸ </span>{v.why}
+                      </p>
+                      {v.note && (
+                        <p style={{ color: "#6b7199", fontSize: 10, lineHeight: 1.7, marginTop: 4 }}>{v.note}</p>
+                      )}
+                    </div>
+                  );
+                })}
               </PixelBorder>
             </div>
           )}
@@ -725,7 +818,7 @@ export default function GamePortfolio() {
         padding: "16px 24px", textAlign: "center", color: "#3a3f5c",
         fontSize: 10, letterSpacing: 1, background: "#080a14",
       }}>
-        © 2025 {STATS.name} — Built with React + Vite on ECS Fargate
+        © 2026 {STATS.name} — Built with React + Vite on S3 + CloudFront
         <br /><span style={{ color: "#2a2e4a" }}>☁ Powered by AWS — GAME OVER? NEVER.</span>
       </div>
     </div>
