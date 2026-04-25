@@ -12,9 +12,8 @@ permissions:
 env:
   AWS_REGION: ap-northeast-1
   AWS_ROLE_ARN: arn:aws:iam::203369940478:role/my-blog-github-actions-deploy-role
-  ECR_REPOSITORY: my-blog
-  ECS_CLUSTER: my-blog-cluster
-  ECS_SERVICE: my-blog-service
+  S3_BUCKET: jishinzerogon-dev-frontend
+  CLOUDFRONT_DISTRIBUTION_ID: ""
 
 jobs:
   deploy:
@@ -24,37 +23,30 @@ jobs:
       - name: コードを取得
         uses: actions/checkout@v6
 
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: 依存関係をインストール
+        run: npm ci
+
+      - name: フロントエンドをビルド
+        run: npm run build
+
       - name: AWS認証情報を設定 (OIDC)
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: ECRにログイン
-        id: ecr-login
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Dockerイメージをビルド・push
-        env:
-          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+      - name: S3 に同期
         run: |
-          docker build \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-            .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          aws s3 sync dist/ s3://$S3_BUCKET/ --delete
 
-      - name: ECSサービスをローリング更新
+      - name: CloudFront キャッシュを無効化
         run: |
-          aws ecs update-service \
-            --cluster $ECS_CLUSTER \
-            --service $ECS_SERVICE \
-            --force-new-deployment
-
-      - name: デプロイ完了を待機
-        run: |
-          aws ecs wait services-stable \
-            --cluster $ECS_CLUSTER \
-            --services $ECS_SERVICE
+          aws cloudfront create-invalidation \
+            --distribution-id $CLOUDFRONT_DISTRIBUTION_ID \
+            --paths "/*"

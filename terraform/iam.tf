@@ -74,32 +74,27 @@ resource "aws_iam_role_policy" "github_actions_deploy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "EcrAuth"
-        Effect   = "Allow"
-        Action   = "ecr:GetAuthorizationToken"
-        Resource = "*"
-      },
-      {
-        Sid    = "EcrPush"
+        Sid    = "S3Sync"
         Effect = "Allow"
         Action = [
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:BatchGetImage",
-          "ecr:CompleteLayerUpload",
-          "ecr:InitiateLayerUpload",
-          "ecr:PutImage",
-          "ecr:UploadLayerPart",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:ListBucket",
         ]
-        Resource = aws_ecr_repository.my_blog.arn
+        Resource = [
+          aws_s3_bucket.frontend.arn,
+          "${aws_s3_bucket.frontend.arn}/*",
+        ]
       },
       {
-        Sid    = "EcsDeploy"
+        Sid    = "CloudFrontInvalidate"
         Effect = "Allow"
         Action = [
-          "ecs:UpdateService",
-          "ecs:DescribeServices",
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation",
         ]
-        Resource = "arn:aws:ecs:${var.region}:*:service/${var.project}-cluster/${var.project}-service"
+        Resource = aws_cloudfront_distribution.main.arn
       },
     ]
   })
@@ -171,6 +166,8 @@ resource "aws_iam_role_policy" "github_actions_plan" {
           "cloudfront:ListTagsForResource",
           "cloudfront:GetCachePolicy",
           "cloudfront:ListCachePolicies",
+          "cloudfront:GetOriginAccessControl",
+          "cloudfront:ListOriginAccessControls",
           "acm:DescribeCertificate",
           "acm:ListTagsForCertificate",
           "logs:DescribeLogGroups",
@@ -180,6 +177,21 @@ resource "aws_iam_role_policy" "github_actions_plan" {
           "iam:ListRolePolicies",
           "iam:ListAttachedRolePolicies",
           "iam:GetOpenIDConnectProvider",
+          "s3:GetBucketPolicy",
+          "s3:GetBucketAcl",
+          "s3:GetBucketCORS",
+          "s3:GetBucketLocation",
+          "s3:GetBucketLogging",
+          "s3:GetBucketObjectLockConfiguration",
+          "s3:GetBucketPublicAccessBlock",
+          "s3:GetBucketRequestPayment",
+          "s3:GetBucketTagging",
+          "s3:GetBucketVersioning",
+          "s3:GetBucketWebsite",
+          "s3:GetEncryptionConfiguration",
+          "s3:GetLifecycleConfiguration",
+          "s3:GetReplicationConfiguration",
+          "s3:GetAccelerateConfiguration",
         ]
         Resource = "*"
       },
