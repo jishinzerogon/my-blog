@@ -32,9 +32,9 @@ const QUESTS = [
 ];
 
 const INVENTORY = [
-  { name: "AWS Solutions Architect Associate", rarity: "epic", icon: "☁", year: "2026" },
+  { name: "AWS Solutions Architect Associate", rarity: "rare", icon: "☁", year: "2026" },
   { name: "基本情報技術者", rarity: "rare", icon: "📜", year: "2022" },
-  { name: "ITパスポート", rarity: "rare", icon: "📜", year: "2020" },
+  { name: "ITパスポート", rarity: "uncommon", icon: "📜", year: "2020" },
 ];
 
 const POSTS = [];
@@ -43,6 +43,7 @@ const RARITY_COLORS = {
   legendary: { bg: "#FF9900", text: "#1a0a00", glow: "#FF990066", label: "★★★★★" },
   epic: { bg: "#a855f7", text: "#1a001a", glow: "#a855f766", label: "★★★★☆" },
   rare: { bg: "#3b82f6", text: "#001a33", glow: "#3b82f666", label: "★★★☆☆" },
+  uncommon: { bg: "#22c55e", text: "#001a0a", glow: "#22c55e66", label: "★★☆☆☆" },
 };
 
 const TIMELINE = [
@@ -415,9 +416,9 @@ export default function GamePortfolio() {
                   「プレイヤーが快適に遊べるインフラ」を支えることが使命です。
                 </p>
                 <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 2, marginTop: 12 }}>
-                  大規模イベント時の急激なトラフィック増にも耐えられる設計や、
-                  障害発生時に素早く復旧できる運用体制の構築に力を入れてきました。
-                  最近はコンテナ技術と IaC を活用したインフラの自動化・コード化を推進しています。
+                  障害が起きてから復旧するより、障害を起こさない設計・運用を重視するスタンスです。
+                  AWS / オンプレ環境の安定運用とコスト最適化を中心に取り組んできました。
+                  最近は個人開発を題材にコンテナ技術と CI/CD を学習中。Terraform / Ansible による IaC は実務で活用しています。
                 </p>
                 <div style={{ marginTop: 16, padding: "12px 14px", background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2, fontSize: 12, color: "#6b7199", lineHeight: 2 }}>
                   <span style={{ color: "#4a6cf7" }}>▸ 得意分野：</span>
@@ -434,7 +435,7 @@ export default function GamePortfolio() {
                   {[
                     { icon: "⬡", title: "Infrastructure as Code", desc: "手作業を排除し、インフラをコードで管理。再現性と変更履歴を確保する。", color: "#7B42BC" },
                     { icon: "💰", title: "コスト意識のある設計", desc: "必要十分な構成を選び、無駄なリソースを持たない。実務でも月額80%削減を達成。", color: "#eab308" },
-                    { icon: "🛡", title: "障害に強い構成", desc: "落ちないインフラより、落ちても素早く復旧できるインフラを目指す。", color: "#22c55e" },
+                    { icon: "🛡", title: "安定運用ファースト", desc: "必要な可用性を見極め、障害を起こさない設計を優先する。", color: "#22c55e" },
                     { icon: "⟳", title: "自動化ファースト", desc: "繰り返す作業はすべて自動化。CI/CD・監視・アラート対応まで。", color: "#40BE46" },
                   ].map((policy, i) => (
                     <div key={i} style={{
