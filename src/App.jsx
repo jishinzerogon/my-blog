@@ -133,7 +133,7 @@ function Tooltip({ text, children, inline }) {
         <div style={{
           position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
           background: "#1a1d30", border: "1px solid #4a6cf744", borderRadius: 3,
-          padding: "6px 10px", fontSize: 10, color: "#c5cbe3", whiteSpace: "nowrap",
+          padding: "6px 10px", fontSize: 11, color: "#c5cbe3", whiteSpace: "nowrap",
           zIndex: 100, boxShadow: "0 4px 12px #00000066", animation: "fadeIn 0.15s ease",
           pointerEvents: "none", maxWidth: "80vw",
         }}>
@@ -184,12 +184,12 @@ function GaugeBar({ current, max, color, height = 14, label, showText = true, to
   return (
     <Tooltip text={tooltip || ""}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", cursor: tooltip ? "help" : "default" }}>
-        {label && <span style={{ color: "#8890b5", fontSize: 11, fontWeight: 700, width: 28, textAlign: "right" }}>{label}</span>}
+        {label && <span style={{ color: "#8890b5", fontSize: 12, fontWeight: 700, width: 28, textAlign: "right" }}>{label}</span>}
         <div style={{ flex: 1, height, background: "#1a1d30", borderRadius: 1, border: "1px solid #2a2e4a", overflow: "hidden", position: "relative" }}>
           <div style={{ position: "absolute", inset: 0, zIndex: 2, backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent ${height-2}px, #0c0e1a44 ${height-2}px, #0c0e1a44 ${height}px)` }} />
           <div style={{ height: "100%", width: `${animWidth}%`, background: `linear-gradient(180deg, ${color}, ${color}aa)`, boxShadow: `0 0 8px ${color}44`, transition: "width 1.5s cubic-bezier(0.22, 1, 0.36, 1)", position: "relative", zIndex: 1 }} />
         </div>
-        {showText && <span style={{ color: "#8890b5", fontSize: 10, fontFamily: "inherit", width: 64, textAlign: "right" }}>{current}/{max}</span>}
+        {showText && <span style={{ color: "#8890b5", fontSize: 11, fontFamily: "inherit", width: 64, textAlign: "right" }}>{current}/{max}</span>}
       </div>
     </Tooltip>
   );
@@ -233,8 +233,8 @@ function ComingSoon({ icon, message }) {
   return (
     <div style={{ textAlign: "center", padding: "40px 0" }}>
       <div style={{ fontSize: 32, marginBottom: 12 }}>{icon}</div>
-      <div style={{ color: "#4a6cf7", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>COMING SOON</div>
-      <div style={{ color: "#6b7199", fontSize: 12, marginTop: 8 }}>{message}</div>
+      <div style={{ color: "#4a6cf7", fontSize: 15, fontWeight: 700, letterSpacing: 2 }}>COMING SOON</div>
+      <div style={{ color: "#6b7199", fontSize: 13, marginTop: 8 }}>{message}</div>
     </div>
   );
 }
@@ -286,16 +286,16 @@ export default function GamePortfolio() {
       borderLeft: horizontal ? "none" : (activeTab === tab.id ? `2px solid ${tab.id === "treasury" ? "#eab308" : "#4a6cf7"}` : "2px solid transparent"),
       borderBottom: horizontal ? (activeTab === tab.id ? `2px solid ${tab.id === "treasury" ? "#eab308" : "#4a6cf7"}` : "2px solid transparent") : "none",
       padding: horizontal ? "8px 10px" : "7px 10px",
-      fontSize: 12, fontFamily: "inherit", cursor: "pointer",
+      fontSize: 13, fontFamily: "inherit", cursor: "pointer",
       transition: "all 0.15s", textAlign: "left", whiteSpace: "nowrap",
     }}>
-      <span style={{ fontSize: 12, width: horizontal ? "auto" : 16, textAlign: "center", flexShrink: 0 }}>{tab.icon}</span>
+      <span style={{ fontSize: 13, width: horizontal ? "auto" : 16, textAlign: "center", flexShrink: 0 }}>{tab.icon}</span>
       {horizontal ? (
-        <span style={{ fontSize: 11 }}>{tab.label}</span>
+        <span style={{ fontSize: 12 }}>{tab.label}</span>
       ) : (
         <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>
-          <span style={{ fontSize: 11 }}>{tab.label}</span>
-          <span style={{ fontSize: 8, color: "#4a5578" }}>{tab.sub}</span>
+          <span style={{ fontSize: 12 }}>{tab.label}</span>
+          <span style={{ fontSize: 10, color: "#4a5578" }}>{tab.sub}</span>
         </span>
       )}
     </button>
@@ -305,7 +305,7 @@ export default function GamePortfolio() {
     <div style={{
       minHeight: "100vh", background: "#080a14", color: "#c5cbe3",
       fontFamily: "'DotGothic16', 'M PLUS 1 Code', 'Courier New', monospace",
-      fontSize: 14, lineHeight: 1.7, position: "relative", overflow: "hidden",
+      fontSize: 15, lineHeight: 1.7, position: "relative", overflow: "hidden",
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+1+Code:wght@300;400;500;700&family=Press+Start+2P&display=swap');
@@ -351,14 +351,14 @@ export default function GamePortfolio() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <h1 style={{
                 fontFamily: "'Press Start 2P', 'DotGothic16', monospace",
-                fontSize: isMobile ? 11 : 16, color: "#e2e8ff", letterSpacing: 2,
+                fontSize: isMobile ? 12 : 16, color: "#e2e8ff", letterSpacing: 2,
                 animation: "glow 3s ease infinite",
                 overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>{STATS.name}</h1>
               <Tooltip text={STATS.titleTooltip} inline>
-                <div style={{ color: "#4a6cf7", fontSize: isMobile ? 10 : 12, marginTop: 3, fontWeight: 700, cursor: "help" }}>{STATS.title}</div>
+                <div style={{ color: "#4a6cf7", fontSize: isMobile ? 11 : 13, marginTop: 3, fontWeight: 700, cursor: "help" }}>{STATS.title}</div>
               </Tooltip>
-              {!isMobile && <div style={{ color: "#6b7199", fontSize: 11, marginTop: 2 }}>{STATS.subtitle}</div>}
+              {!isMobile && <div style={{ color: "#6b7199", fontSize: 12, marginTop: 2 }}>{STATS.subtitle}</div>}
             </div>
 
             <div style={{ width: isMobile ? "100%" : 240 }}>
@@ -396,7 +396,7 @@ export default function GamePortfolio() {
           }}>
             <PixelBorder style={{ padding: 6 }}>
               <div style={{ padding: "4px 0" }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, padding: "4px 10px", letterSpacing: 2, borderBottom: "1px solid #1a1d30", marginBottom: 2 }}>MENU</div>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, padding: "4px 10px", letterSpacing: 2, borderBottom: "1px solid #1a1d30", marginBottom: 2 }}>MENU</div>
                 {tabs.map(tab => <TabButton key={tab.id} tab={tab} />)}
               </div>
             </PixelBorder>
@@ -413,18 +413,18 @@ export default function GamePortfolio() {
           {activeTab === "status" && (
             <div>
               <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>♦ PROFILE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ステータス</span></div>
-                <p style={{ color: "#c5cbe3", fontSize: 13, lineHeight: 2.2 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>♦ PROFILE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ステータス</span></div>
+                <p style={{ color: "#c5cbe3", fontSize: 14, lineHeight: 2.2 }}>
                   ゲーム業界でインフラエンジニアとして活動中。
                   オンラインゲームのサーバー基盤設計からリリース後の運用まで、
                   「プレイヤーが快適に遊べるインフラ」を支えることが使命です。
                 </p>
-                <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 2, marginTop: 12 }}>
+                <p style={{ color: "#8890b5", fontSize: 13, lineHeight: 2, marginTop: 12 }}>
                   障害が起きてから復旧するより、障害を起こさない設計・運用を重視するスタンスです。
                   AWS / オンプレ環境の安定運用とコスト最適化を中心に取り組んできました。
                   最近は個人開発を題材にコンテナ技術と CI/CD を学習中。Terraform / Ansible による IaC は実務で活用しています。
                 </p>
-                <div style={{ marginTop: 16, padding: "12px 14px", background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2, fontSize: 12, color: "#6b7199", lineHeight: 2 }}>
+                <div style={{ marginTop: 16, padding: "12px 14px", background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2, fontSize: 13, color: "#6b7199", lineHeight: 2 }}>
                   <span style={{ color: "#4a6cf7" }}>▸ 得意分野：</span>
                   AWS環境の構築・運用 / IaC (Terraform・Ansible) / コスト最適化
                 </div>
@@ -432,7 +432,7 @@ export default function GamePortfolio() {
 
               {/* Values / Policy */}
               <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   🎯 POLICY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 大事にしていること</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 10 }}>
@@ -449,9 +449,9 @@ export default function GamePortfolio() {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                         <span style={{ fontSize: 16, color: policy.color }}>{policy.icon}</span>
-                        <span style={{ color: "#e2e8ff", fontSize: 12, fontWeight: 600 }}>{policy.title}</span>
+                        <span style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{policy.title}</span>
                       </div>
-                      <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8 }}>{policy.desc}</p>
+                      <p style={{ color: "#6b7199", fontSize: 12, lineHeight: 1.8 }}>{policy.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -459,7 +459,7 @@ export default function GamePortfolio() {
 
               {/* Infra Architecture Diagram */}
               <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   🗺 ARCHITECTURE <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— このサイトのインフラ構成</span>
                 </div>
 
@@ -485,7 +485,7 @@ export default function GamePortfolio() {
                   },
                 ].map((flow, fi) => (
                   <div key={fi} style={{ marginBottom: fi === 0 ? 18 : 0 }}>
-                    <div style={{ color: "#6b7199", fontSize: 10, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>
+                    <div style={{ color: "#6b7199", fontSize: 11, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>
                       {flow.label}
                       <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0, marginLeft: 6 }}>— {flow.sub}</span>
                     </div>
@@ -500,7 +500,7 @@ export default function GamePortfolio() {
                               background: `${node.color}11`, color: node.color,
                               border: `1px solid ${node.color}33`,
                               padding: isMobile ? "4px 8px" : "6px 14px",
-                              borderRadius: 2, fontSize: isMobile ? 10 : 12,
+                              borderRadius: 2, fontSize: isMobile ? 11 : 13,
                               fontWeight: 500, whiteSpace: "nowrap", cursor: "help",
                               transition: "all 0.2s",
                             }}>{node.name}</span>
@@ -508,7 +508,7 @@ export default function GamePortfolio() {
                         ];
                         if (ni < flow.nodes.length - 1) {
                           items.push(
-                            <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 12 : 16 }}>→</span>
+                            <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 13 : 16 }}>→</span>
                           );
                         }
                         return items;
@@ -517,14 +517,14 @@ export default function GamePortfolio() {
                   </div>
                 ))}
 
-                <div style={{ textAlign: "center", color: "#4a5578", fontSize: 9, marginTop: 8 }}>
+                <div style={{ textAlign: "center", color: "#4a5578", fontSize: 11, marginTop: 8 }}>
                   ※ 各サービス名にホバーすると役割が表示されます
                 </div>
               </PixelBorder>
 
               {/* Infra History */}
               <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px" }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   🕰 INFRA HISTORY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— インフラ変遷</span>
                 </div>
 
@@ -544,16 +544,16 @@ export default function GamePortfolio() {
                     }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
                         <span style={{
-                          color: statusColor, fontSize: 10, fontWeight: 700,
+                          color: statusColor, fontSize: 11, fontWeight: 700,
                           fontFamily: "'Press Start 2P', monospace", letterSpacing: 1,
                         }}>{v.version}</span>
-                        <span style={{ color: "#6b7199", fontSize: 10 }}>{v.date}</span>
+                        <span style={{ color: "#6b7199", fontSize: 11 }}>{v.date}</span>
                         <span style={{
-                          fontSize: 9, color: statusColor, background: `${statusColor}22`,
+                          fontSize: 11, color: statusColor, background: `${statusColor}22`,
                           border: `1px solid ${statusColor}55`, padding: "1px 7px", borderRadius: 2, letterSpacing: 1, fontWeight: 700,
                         }}>{statusLabel}</span>
                       </div>
-                      <div style={{ color: "#e2e8ff", fontSize: isMobile ? 12 : 13, fontWeight: 600, marginBottom: 8 }}>{v.title}</div>
+                      <div style={{ color: "#e2e8ff", fontSize: isMobile ? 13 : 14, fontWeight: 600, marginBottom: 8 }}>{v.title}</div>
 
                       <div style={{
                         display: "flex", alignItems: "center", flexWrap: "wrap",
@@ -563,24 +563,24 @@ export default function GamePortfolio() {
                         {v.flow.flatMap((node, ni) => {
                           const items = [
                             <span key={`n-${ni}`} style={{
-                              color: "#8890b5", fontSize: isMobile ? 10 : 11,
+                              color: "#8890b5", fontSize: isMobile ? 11 : 12,
                               whiteSpace: "nowrap",
                             }}>{node}</span>,
                           ];
                           if (ni < v.flow.length - 1) {
                             items.push(
-                              <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 10 : 12 }}>→</span>
+                              <span key={`a-${ni}`} style={{ color: "#2a2e4a", fontSize: isMobile ? 11 : 13 }}>→</span>
                             );
                           }
                           return items;
                         })}
                       </div>
 
-                      <p style={{ color: "#8890b5", fontSize: 11, lineHeight: 1.7 }}>
+                      <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.7 }}>
                         <span style={{ color: statusColor }}>▸ </span>{v.why}
                       </p>
                       {v.note && (
-                        <p style={{ color: "#6b7199", fontSize: 10, lineHeight: 1.7, marginTop: 4 }}>{v.note}</p>
+                        <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.7, marginTop: 4 }}>{v.note}</p>
                       )}
                     </div>
                   );
@@ -592,7 +592,7 @@ export default function GamePortfolio() {
           {/* SKILLS */}
           {activeTab === "skills" && (
             <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
-              <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>✦ SKILLS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 技術スキル</span></div>
+              <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>✦ SKILLS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 技術スキル</span></div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
                 {SKILLS.map((skill, i) => (
                   <div key={skill.name} onClick={() => setSelectedSkill(selectedSkill===i?null:i)} style={{
@@ -604,17 +604,17 @@ export default function GamePortfolio() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <span style={{ fontSize: 16 }}>{skill.element}</span>
-                        <span style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{skill.name}</span>
+                        <span style={{ color: "#e2e8ff", fontSize: 14, fontWeight: 600 }}>{skill.name}</span>
                       </div>
-                      <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 9, color: skill.color }}>{skill.years}yr</span>
+                      <span style={{ fontFamily: "'Press Start 2P', monospace", fontSize: 11, color: skill.color }}>{skill.years}yr</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                      <span style={{ color: "#6b7199", fontSize: 9, flexShrink: 0 }}>経験 {skill.years}年</span>
+                      <span style={{ color: "#6b7199", fontSize: 11, flexShrink: 0 }}>経験 {skill.years}年</span>
                     </div>
                     <GaugeBar current={skill.years} max={MAX_YEARS} color={skill.color} height={8} showText={false} />
                     <div style={{ display: "flex", gap: 4, marginTop: 10, flexWrap: "wrap" }}>
                       {skill.tags.map(tag => (
-                        <span key={tag} style={{ fontSize: 9, color: skill.color, background: `${skill.color}11`, border: `1px solid ${skill.color}22`, padding: "1px 7px", borderRadius: 2 }}>{tag}</span>
+                        <span key={tag} style={{ fontSize: 11, color: skill.color, background: `${skill.color}11`, border: `1px solid ${skill.color}22`, padding: "1px 7px", borderRadius: 2 }}>{tag}</span>
                       ))}
                     </div>
                   </div>
@@ -627,21 +627,21 @@ export default function GamePortfolio() {
           {activeTab === "quests" && (
             <div>
               <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>⚑ CAREER <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 職歴</span></div>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>⚑ CAREER <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 職歴</span></div>
                 {QUESTS.map((quest, i) => (
                   <div key={i} style={{
                     background: "#0f1229", border: `1px solid ${quest.status==="active"?"#4a6cf744":"#1a1d30"}`,
                     borderRadius: 2, padding: isMobile?"12px 14px":"16px 18px", marginBottom: 12, position: "relative",
                     animation: "slideUp 0.4s ease both", animationDelay: `${i*150}ms`,
                   }}>
-                    {quest.status==="active" && <div style={{ position: "absolute", top: 8, right: 10, background: "#22c55e22", color: "#22c55e", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 2, border: "1px solid #22c55e44", letterSpacing: 1 }}>ACTIVE</div>}
-                    {quest.status==="complete" && <div style={{ position: "absolute", top: 8, right: 10, color: "#6b7199", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>COMPLETE ✓</div>}
+                    {quest.status==="active" && <div style={{ position: "absolute", top: 8, right: 10, background: "#22c55e22", color: "#22c55e", fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 2, border: "1px solid #22c55e44", letterSpacing: 1 }}>ACTIVE</div>}
+                    {quest.status==="complete" && <div style={{ position: "absolute", top: 8, right: 10, color: "#6b7199", fontSize: 11, fontWeight: 700, letterSpacing: 1 }}>COMPLETE ✓</div>}
                     <div style={{ color: "#e2e8ff", fontSize: isMobile?13:14, fontWeight: 600, marginBottom: 4, paddingRight: 70 }}>{quest.title}</div>
-                    <div style={{ color: "#4a6cf7", fontSize: 12, marginBottom: 2 }}>{quest.guild}</div>
-                    <div style={{ color: "#6b7199", fontSize: 10, marginBottom: 8 }}>{quest.period}</div>
-                    <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.8 }}>{quest.desc}</p>
+                    <div style={{ color: "#4a6cf7", fontSize: 13, marginBottom: 2 }}>{quest.guild}</div>
+                    <div style={{ color: "#6b7199", fontSize: 11, marginBottom: 8 }}>{quest.period}</div>
+                    <p style={{ color: "#8890b5", fontSize: 13, lineHeight: 1.8 }}>{quest.desc}</p>
                     {quest.note && (
-                      <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8, marginTop: 6 }}>{quest.note}</p>
+                      <p style={{ color: "#6b7199", fontSize: 12, lineHeight: 1.8, marginTop: 6 }}>{quest.note}</p>
                     )}
                   </div>
                 ))}
@@ -649,7 +649,7 @@ export default function GamePortfolio() {
 
               {/* Activity timeline */}
               <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 20 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 20 }}>
                   ⏳ ACTIVITY <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 活動・成果の記録</span>
                 </div>
 
@@ -658,7 +658,7 @@ export default function GamePortfolio() {
                   {Object.entries(TIMELINE_TYPES).map(([key, t]) => (
                     <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ width: 8, height: 8, borderRadius: "50%", background: t.color, boxShadow: `0 0 6px ${t.color}66` }} />
-                      <span style={{ color: "#6b7199", fontSize: 10 }}>{t.label}</span>
+                      <span style={{ color: "#6b7199", fontSize: 11 }}>{t.label}</span>
                     </div>
                   ))}
                 </div>
@@ -683,21 +683,21 @@ export default function GamePortfolio() {
                           boxShadow: `0 0 6px ${t.color}88`,
                         }} />
                         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                          <span style={{ color: "#6b7199", fontSize: 10, fontFamily: "'Press Start 2P', monospace" }}>{event.date}</span>
+                          <span style={{ color: "#6b7199", fontSize: 11, fontFamily: "'Press Start 2P', monospace" }}>{event.date}</span>
                           <span style={{
-                            fontSize: 9, color: t.color, background: `${t.color}11`,
+                            fontSize: 11, color: t.color, background: `${t.color}11`,
                             border: `1px solid ${t.color}44`, padding: "1px 7px", borderRadius: 2, letterSpacing: 1,
                           }}>{t.label}</span>
                           {event.ongoing && (
                             <span style={{
-                              fontSize: 9, color: "#eab308", background: "#eab30822",
+                              fontSize: 11, color: "#eab308", background: "#eab30822",
                               border: "1px solid #eab30866", padding: "1px 7px", borderRadius: 2, letterSpacing: 1,
                               animation: "goldGlow 2s ease infinite", fontWeight: 700,
                             }}>進行中</span>
                           )}
                         </div>
-                        <div style={{ color: "#e2e8ff", fontSize: isMobile ? 12 : 13, fontWeight: 600, marginBottom: 4 }}>{event.title}</div>
-                        <p style={{ color: "#8890b5", fontSize: 11, lineHeight: 1.7 }}>{event.desc}</p>
+                        <div style={{ color: "#e2e8ff", fontSize: isMobile ? 13 : 14, fontWeight: 600, marginBottom: 4 }}>{event.title}</div>
+                        <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.7 }}>{event.desc}</p>
                       </div>
                     );
                   })}
@@ -709,7 +709,7 @@ export default function GamePortfolio() {
           {/* INVENTORY */}
           {activeTab === "inventory" && (
             <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
-              <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>◈ CERTIFICATIONS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 装備・資格</span></div>
+              <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>◈ CERTIFICATIONS <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 装備・資格</span></div>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
                 {INVENTORY.map((item, i) => {
                   const r = RARITY_COLORS[item.rarity];
@@ -725,11 +725,11 @@ export default function GamePortfolio() {
                           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                             <span style={{ fontSize: 22, filter: `drop-shadow(0 0 4px ${r.glow})` }}>{item.icon}</span>
                             <div>
-                              <div style={{ color: "#e2e8ff", fontSize: 12, fontWeight: 600 }}>{item.name}</div>
-                              <div style={{ color: r.bg, fontSize: 10, marginTop: 2, letterSpacing: 1 }}>{r.label}</div>
+                              <div style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{item.name}</div>
+                              <div style={{ color: r.bg, fontSize: 11, marginTop: 2, letterSpacing: 1 }}>{r.label}</div>
                             </div>
                           </div>
-                          <span style={{ color: "#6b7199", fontSize: 10 }}>{item.year}</span>
+                          <span style={{ color: "#6b7199", fontSize: 11 }}>{item.year}</span>
                         </div>
                       </div>
                     </div>
@@ -742,7 +742,7 @@ export default function GamePortfolio() {
           {/* LOG */}
           {activeTab === "log" && (
             <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
-              <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>📖 BLOG <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 冒険記録</span></div>
+              <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>📖 BLOG <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 冒険記録</span></div>
               <ComingSoon icon="📖" message="冒険記録を準備中..." />
             </PixelBorder>
           )}
@@ -750,7 +750,7 @@ export default function GamePortfolio() {
           {/* TREASURY */}
           {activeTab === "treasury" && (
             <PixelBorder style={{ padding: isMobile?"16px 12px":"20px 24px" }}>
-              <div style={{ color: "#eab308", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+              <div style={{ color: "#eab308", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                 💰 INFRA COST <span style={{ color: "#b4891888", fontWeight: 400, letterSpacing: 0 }}>— ギルド金庫</span>
               </div>
               <ComingSoon icon="💰" message="コストデータを準備中..." />
@@ -761,10 +761,10 @@ export default function GamePortfolio() {
           {activeTab === "contact" && (
             <div>
               <PixelBorder style={{ padding: isMobile ? "16px 14px" : "20px 24px", marginBottom: 16 }}>
-                <div style={{ color: "#4a6cf7", fontSize: 10, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
+                <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>
                   ✉ CONTACT <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ギルド受付</span>
                 </div>
-                <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.9, marginBottom: 20 }}>
+                <p style={{ color: "#8890b5", fontSize: 13, lineHeight: 1.9, marginBottom: 20 }}>
                   カジュアル面談のお誘い・採用に関するお問い合わせなど、お気軽にどうぞ。
                   <br />下記のいずれかからご連絡ください。
                 </p>
@@ -790,8 +790,8 @@ export default function GamePortfolio() {
                         {c.icon}
                       </div>
                       <div>
-                        <div style={{ color: "#e2e8ff", fontSize: 13, fontWeight: 600 }}>{c.name}</div>
-                        <div style={{ color: "#6b7199", fontSize: 10, marginTop: 2 }}>{c.desc}</div>
+                        <div style={{ color: "#e2e8ff", fontSize: 14, fontWeight: 600 }}>{c.name}</div>
+                        <div style={{ color: "#6b7199", fontSize: 11, marginTop: 2 }}>{c.desc}</div>
                       </div>
                       <span style={{ marginLeft: "auto", color: "#2a2e4a", fontSize: 16, flexShrink: 0 }}>→</span>
                     </a>
@@ -808,7 +808,7 @@ export default function GamePortfolio() {
       <div style={{
         position: "relative", zIndex: 10, borderTop: "2px solid #1a1d30",
         padding: "16px 24px", textAlign: "center", color: "#3a3f5c",
-        fontSize: 10, letterSpacing: 1, background: "#080a14",
+        fontSize: 11, letterSpacing: 1, background: "#080a14",
       }}>
         © 2026 {STATS.name} — Built with React + Vite on S3 + CloudFront
         <br /><span style={{ color: "#2a2e4a" }}>☁ Powered by AWS — GAME OVER? NEVER.</span>
