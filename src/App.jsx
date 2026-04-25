@@ -48,6 +48,8 @@ const RARITY_COLORS = {
 
 const TIMELINE = [
   // ▼ 個人開発 (my-blog)
+  { date: "2026-04-25", type: "personal", title: "ECS Fargate から S3 + CloudFront へ移行 (OAC)", desc: "用途に対してオーバースペックだった ECS Fargate 構成を、静的 SPA 配信に最適化した S3 + CloudFront (OAC) 構成に移行。固定費 ~$22/月 → ~$0.10/月。ECS リソース定義は count トグルで残置し、後のバックエンド追加で再利用予定。" },
+  { date: "2026-04-25", type: "personal", title: "Zenn 1 本目公開 (ECS + Terraform 構築編)", desc: "ポートフォリオサイトを React + Vite + ECS Fargate + Terraform で構築した経緯を記事化し、Zenn で公開。" },
   { date: "2026-04-16", type: "personal", title: "React + Vite でポートフォリオページを実装", desc: "ゲーム UI 風のポートフォリオページを Vite で構築。Docker イメージに同梱して ECS Fargate で配信。" },
   { date: "2026-04-14", type: "personal", title: "GitHub Actions による ECS 自動デプロイ", desc: "OIDC で AWS 認証し、ECR push → ECS update-service --force-new-deployment → wait services-stable まで自動化。" },
   { date: "2026-04-04", type: "personal", title: "AWS インフラ構築 (VPC / ALB / ECS Fargate / CloudFront)", desc: "Terraform でゼロから AWS 環境を構築。CloudFront → ALB → ECS Fargate (nginx) の配信経路を開通。" },
@@ -100,7 +102,9 @@ const INFRA_VERSIONS = [
 ];
 
 const CONTACTS = [
+  { name: "Email", icon: "@", url: "mailto:ryouto0815@gmail.com", color: "#eab308", desc: "最も確実な連絡手段" },
   { name: "GitHub", icon: "◈", url: "https://github.com/jishinzerogon", color: "#c9d1d9", desc: "ソースコード & コントリビューション" },
+  { name: "X (Twitter)", icon: "𝕏", url: "https://x.com/jishinzerogon", color: "#e2e8ff", desc: "@jishinzerogon" },
 ];
 
 /* ─── HOOKS ─── */
@@ -761,7 +765,7 @@ export default function GamePortfolio() {
                   ✉ CONTACT <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— ギルド受付</span>
                 </div>
                 <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.9, marginBottom: 20 }}>
-                  お仕事のご依頼・技術的なご相談・カジュアル面談のお誘いなど、お気軽にどうぞ。
+                  カジュアル面談のお誘い・採用に関するお問い合わせなど、お気軽にどうぞ。
                   <br />下記のいずれかからご連絡ください。
                 </p>
 
@@ -792,19 +796,6 @@ export default function GamePortfolio() {
                       <span style={{ marginLeft: "auto", color: "#2a2e4a", fontSize: 16, flexShrink: 0 }}>→</span>
                     </a>
                   ))}
-                </div>
-              </PixelBorder>
-
-              <PixelBorder style={{ padding: isMobile ? "14px 14px" : "16px 24px" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                  <span style={{ fontSize: 16, flexShrink: 0, marginTop: 2 }}>💬</span>
-                  <div>
-                    <div style={{ color: "#e2e8ff", fontSize: 12, fontWeight: 600, marginBottom: 4 }}>返信について</div>
-                    <p style={{ color: "#6b7199", fontSize: 11, lineHeight: 1.8 }}>
-                      通常 1〜2 営業日以内にご返信いたします。<br />
-                      お急ぎの場合は Email にてご連絡ください。
-                    </p>
-                  </div>
                 </div>
               </PixelBorder>
             </div>
