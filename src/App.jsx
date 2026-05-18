@@ -48,7 +48,7 @@ const RARITY_COLORS = {
 
 const TIMELINE = [
   // ▼ 個人開発 (my-blog)
-  { date: "2026-04-25", type: "personal", title: "ECS Fargate から S3 + CloudFront へ移行 (OAC)", desc: "用途に対してオーバースペックだった ECS Fargate 構成を、静的 SPA 配信に最適化した S3 + CloudFront (OAC) 構成に移行。固定費 ~$22/月 → ~$0.10/月。ECS リソース定義は count トグルで残置し、後のバックエンド追加で再利用予定。" },
+  { date: "2026-04-25", type: "personal", title: "ECS Fargate から S3 + CloudFront へ移行 (OAC)", desc: "用途に対してオーバースペックだった ECS Fargate 構成を、静的 SPA 配信に最適化した S3 + CloudFront (OAC) 構成に移行。固定費 ~$22/月 → ~$0.10/月。今後バックエンドが必要になった際は、維持費の少ない Lambda で追加する方針。" },
   { date: "2026-04-25", type: "personal", title: "Zenn 1 本目公開 (ECS + Terraform 構築編)", desc: "ポートフォリオサイトを React + Vite + ECS Fargate + Terraform で構築した経緯を記事化し、Zenn で公開。" },
   { date: "2026-04-16", type: "personal", title: "React + Vite でポートフォリオページを実装", desc: "ゲーム UI 風のポートフォリオページを Vite で構築。Docker イメージに同梱して ECS Fargate で配信。" },
   { date: "2026-04-14", type: "personal", title: "GitHub Actions による ECS 自動デプロイ", desc: "OIDC で AWS 認証し、ECR push → ECS update-service --force-new-deployment → wait services-stable まで自動化。" },
@@ -89,15 +89,15 @@ const INFRA_VERSIONS = [
     status: "current",
     flow: ["Cloudflare DNS", "CloudFront", "S3 (OAC)"],
     why: "静的 SPA に最適化。OAC で S3 を private に保ったまま CloudFront 経由のみアクセス許可。",
-    note: "固定費が実質ゼロに (CloudFront Always Free 枠で月 $0.10 以下)。Phase 2 で Rails API を /api/* に追加できるよう ECS リソース定義は残置。",
+    note: "固定費が実質ゼロに (CloudFront Always Free 枠で月 $0.10 以下)。動的処理が必要になれば、維持費の少ない Lambda を /api/* に追加する Phase 2 を想定。",
   },
   {
     version: "Phase 2",
     date: "予定",
-    title: "Rails API 追加 — 動的エンドポイントを ECS で再活用",
+    title: "Lambda で動的エンドポイントを追加",
     status: "planned",
-    flow: ["CloudFront", "/api/* → ALB", "ECS (Rails)", "+ 既存 S3"],
-    why: "アクセスカウンタ等の動的処理用に Rails API を追加。CloudFront に /api/* ビヘイビア追加で既存 ALB+ECS を再利用。",
+    flow: ["CloudFront", "/api/* → Lambda (Function URL)", "DynamoDB", "+ 既存 S3"],
+    why: "アクセスカウンターとサイトの稼働コスト表示を Lambda + DynamoDB で実装。CloudFront に /api/* ビヘイビアを追加し、Lambda Function URL をオリジンに指定。常時起動するリソースがなく維持費はほぼゼロ。",
   },
 ];
 
