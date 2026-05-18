@@ -37,7 +37,20 @@ const INVENTORY = [
   { name: "ITパスポート", rarity: "uncommon", icon: "📜", year: "2020" },
 ];
 
-const POSTS = [];
+const POSTS = [
+  {
+    date: "2026-05-16", emoji: "🐲", platform: "Zenn",
+    title: "ポートフォリオサイトを ECS Fargate から S3 + CloudFront に移行した話",
+    url: "https://zenn.dev/jishinzerogon/articles/d46148c6778e3c",
+    desc: "コンテナ配信から静的配信への \"ダウンサイズ\" を選んだ判断軸、トグルで構成を切り替える設計、OAC 構成の作り込みをまとめた記事。",
+  },
+  {
+    date: "2026-04-25", emoji: "🐉", platform: "Zenn",
+    title: "ECS Fargate + Terraformでポートフォリオサイトを構築した話（CI/CD・コスト最適化・設計まとめ）",
+    url: "https://zenn.dev/jishinzerogon/articles/9a2c479a3e904b",
+    desc: "ポートフォリオサイトを React + Vite + ECS Fargate + Terraform で構築した経緯・技術選定・工夫・ハマり所をまとめた記事。",
+  },
+];
 
 const RARITY_COLORS = {
   legendary: { bg: "#FF9900", text: "#1a0a00", glow: "#FF990066", label: "★★★★★" },
@@ -49,13 +62,13 @@ const RARITY_COLORS = {
 const TIMELINE = [
   // ▼ 個人開発 (my-blog)
   { date: "2026-04-25", type: "personal", title: "ECS Fargate から S3 + CloudFront へ移行 (OAC)", desc: "用途に対してオーバースペックだった ECS Fargate 構成を、静的 SPA 配信に最適化した S3 + CloudFront (OAC) 構成に移行。固定費 ~$22/月 → ~$0.10/月。今後バックエンドが必要になった際は、維持費の少ない Lambda で追加する方針。" },
-  { date: "2026-04-25", type: "personal", title: "Zenn 1 本目公開 (ECS + Terraform 構築編)", desc: "ポートフォリオサイトを React + Vite + ECS Fargate + Terraform で構築した経緯を記事化し、Zenn で公開。" },
+  { date: "2026-04-25", type: "personal", title: "Zenn で技術記事の執筆・発信を開始", desc: "ポートフォリオ構築で得た知見を記事化し、Zenn での技術発信を開始。以降の記事はブログタブに掲載していく。" },
   { date: "2026-04-16", type: "personal", title: "React + Vite でポートフォリオページを実装", desc: "ゲーム UI 風のポートフォリオページを Vite で構築。Docker イメージに同梱して ECS Fargate で配信。" },
   { date: "2026-04-14", type: "personal", title: "GitHub Actions による ECS 自動デプロイ", desc: "OIDC で AWS 認証し、ECR push → ECS update-service --force-new-deployment → wait services-stable まで自動化。" },
   { date: "2026-04-04", type: "personal", title: "AWS インフラ構築 (VPC / ALB / ECS Fargate / CloudFront)", desc: "Terraform でゼロから AWS 環境を構築。CloudFront → ALB → ECS Fargate (nginx) の配信経路を開通。" },
 
   // ▼ 業務実績
-  { date: "2026-04〜", type: "work", ongoing: true, title: "オンプレミスサーバーの AWS S3 バックアップ基盤構築", desc: "10 年以上稼働する既存オンプレサーバーのバックアップ先として、AWS S3 を新たに採用する移行プロジェクトを主担当で推進中。EC2 + rclone による転送基盤の設計・検討を進めている。" },
+  { date: "2026-04〜", type: "work", ongoing: true, title: "オンプレミスサーバーの AWS S3 バックアップ基盤構築", desc: "10 年以上稼働する既存オンプレサーバーのバックアップ先として、AWS S3 を新たに採用する移行プロジェクトを主担当で推進中。物理サーバーが故障した際は、S3 に保存したバックアップデータを使って別の物理サーバーへ移行・復旧する構成を採用。" },
   { date: "2026-03", type: "work", title: "AWS SES の bounce / complaint 監視基盤を構築", desc: "メール送信時の bounce (配信失敗) / complaint (苦情) 情報を SES → SNS → Lambda で整形して CloudWatch Logs に集約し、閾値超過時は Google Chat へ通知するモジュールを実装。送信レピュテーション低下 (最悪の場合は SES 送信停止) の前兆を早期検知できる仕組み。その後、AWS で運営している SES 利用タイトル全てに横展開。" },
   // TODO: 削減額・EC2/RDS 台数などの具体数値を確認でき次第、desc に追記する
   { date: "2026-01", type: "work", title: "稼働中ゲーム 3 タイトル目のコスト削減 (最大規模)", desc: "前 2 タイトルからの連続で、3 件目のゲームタイトルでインフラ縮退・コスト最適化を実施。これまでで最大規模の環境に対して、確立した手法を踏襲しつつ適用範囲を拡大。" },
@@ -743,7 +756,46 @@ export default function GamePortfolio() {
           {activeTab === "log" && (
             <PixelBorder style={{ padding: isMobile ? "16px 12px" : "20px 24px" }}>
               <div style={{ color: "#4a6cf7", fontSize: 11, fontWeight: 700, letterSpacing: 2, marginBottom: 16 }}>📖 BLOG <span style={{ color: "#4a5578", fontWeight: 400, letterSpacing: 0 }}>— 冒険記録</span></div>
-              <ComingSoon icon="📖" message="冒険記録を準備中..." />
+              {POSTS.length === 0 ? (
+                <ComingSoon icon="📖" message="冒険記録を準備中..." />
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {POSTS.map((post, i) => (
+                    <a key={post.url} href={post.url} target="_blank" rel="noopener noreferrer" style={{
+                      textDecoration: "none",
+                      background: "#0f1229", border: "1px solid #1a1d30", borderRadius: 2,
+                      padding: isMobile ? "12px 14px" : "14px 18px",
+                      display: "flex", alignItems: "flex-start", gap: 14,
+                      cursor: "pointer", transition: "all 0.2s",
+                      animation: "slideUp 0.4s ease both", animationDelay: `${i * 80}ms`,
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "#4a6cf766"; e.currentTarget.style.transform = "translateX(4px)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#1a1d30"; e.currentTarget.style.transform = "translateX(0)"; }}
+                    >
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 2,
+                        background: "#4a6cf711", border: "1px solid #4a6cf733",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 20, flexShrink: 0,
+                      }}>
+                        {post.emoji}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                          <span style={{ color: "#6b7199", fontSize: 11, fontFamily: "'Press Start 2P', monospace" }}>{post.date}</span>
+                          <span style={{
+                            fontSize: 11, color: "#4a6cf7", background: "#4a6cf711",
+                            border: "1px solid #4a6cf744", padding: "1px 7px", borderRadius: 2, letterSpacing: 1,
+                          }}>{post.platform}</span>
+                        </div>
+                        <div style={{ color: "#e2e8ff", fontSize: isMobile ? 13 : 14, fontWeight: 600, lineHeight: 1.6 }}>{post.title}</div>
+                        {post.desc && <p style={{ color: "#8890b5", fontSize: 12, lineHeight: 1.7, marginTop: 4 }}>{post.desc}</p>}
+                      </div>
+                      <span style={{ color: "#2a2e4a", fontSize: 16, flexShrink: 0 }}>→</span>
+                    </a>
+                  ))}
+                </div>
+              )}
             </PixelBorder>
           )}
 
